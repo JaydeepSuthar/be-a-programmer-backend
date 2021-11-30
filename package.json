@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": "16.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/JaydeepSuthar/be-a-programmer-backend.git"
+  },
+  "author": "Jaydeep Suthar <technicaljade@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JaydeepSuthar/be-a-programmer-backend/issues"
+  },
+  "homepage": "https://github.com/JaydeepSuthar/be-a-programmer-backend#readme",
+  "dependencies": {
+    "bcrypt": "5.0.1",
+    "dotenv": "10.0.0",
+    "express": "4.17.1",
+    "helmet": "4.6.0",
+    "jsonwebtoken": "8.5.1",
+    "mongoose": "6.0.14",
+    "morgan": "1.10.0"
+  }
+}
