@@ -4,10 +4,14 @@ const express = require('express');
 const helmet = require('helmet');
 const logger = require('morgan');
 const cors = require('cors');
+const { connect } = require('mongoose');
 
 // * INIT
 const app = express();
 const port = process.env.PORT || 8080;
+
+// * DB
+connect(process.env.MONGO_URI, console.log(`DB CONNECTED`));
 
 // * MIDDLEWARES
 app.use(express.json());
