@@ -2,7 +2,8 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 
 // * VALIDATION
-const { registerUserValidation, loginUserValidation } = require('../../helper/validation');
+const { registerUserValidation, loginUserValidation, generateToken } = require('../../helper/validation');
+const verifyToken = require('../../middlewares/verifyToken');
 
 // * MODEL
 const User = require('../../models/user');
@@ -16,12 +17,17 @@ router.post('/signup', async (req, res) => {
     const { error, value } = registerUserValidation({ name, email, password });
     if (error) return res.status(400).json({ 'error': error.details[0].message });
 
+    // check user email already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) return res.status(400).json({ "msg": "Email is already register" });
+
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // * saving it in db
     const user = new User({
         name: name,
-        email: email,
+        email: email.toLowerCase(),
         password: hashedPassword
     });
 
@@ -54,11 +60,21 @@ router.post('/login', async (req, res) => {
     const isValidPass = await bcrypt.compare(password, user.password);
     if (!isValidPass) return res.status(400).json({ "msg": "Email and Password Doesn't match" });
 
+    // const token = jwt.sign
+    const token = generateToken(user._id);
+
     res.json({
-        "msg": "you are logged in"
+        "msg": "you are logged in",
+        token
     });
 
     res.end();
+});
+
+
+// * this is just a test route
+router.get('/secret', verifyToken, (req, res) => {
+    res.status(200).json({ "msg": "I am Secret" });
 });
 
 module.exports = router;

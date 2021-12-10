@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
 
 module.exports.registerUserValidation = (data) => {
     const registerUserSchema = Joi.object({
@@ -18,4 +19,9 @@ module.exports.loginUserValidation = (data) => {
     });
 
     return loginUserSchema.validate(data);
+};
+
+
+module.exports.generateToken = (userId) => {
+    return jwt.sign({ _id: userId }, process.env.TOKEN_SECRET, { expiresIn: 60 });
 };
