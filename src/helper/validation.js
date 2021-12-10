@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 module.exports.registerUserValidation = (data) => {
     const registerUserSchema = Joi.object({
-        username: Joi.string().min(3).max(20).required(),
+        name: Joi.string().min(3).max(20).required(),
         email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'io', 'dev'] } }).required(),
         password: Joi.string().min(6).max(16).required(),
     });
