@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const bcrypt = require('bcrypt');
 
 // * VALIDATION
 const { registerUserValidation, loginUserValidation } = require('../../helper/validation');
@@ -15,12 +16,13 @@ router.post('/signup', async (req, res) => {
     const { error, value } = registerUserValidation({ name, email, password });
     if (error) return res.status(400).json({ 'error': error.details[0].message });
 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // * saving it in db
     const user = new User({
         name: name,
         email: email,
-        password: password
+        password: hashedPassword
     });
 
     try {
@@ -45,19 +47,16 @@ router.post('/login', async (req, res) => {
     if (error) return res.status(400).json({ 'error': error.details[0].message });
 
     // Check email and password is valid
-
     const user = await User.findOne({ email: email });
     if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
 
+    // check password hash is valid
+    const isValidPass = await bcrypt.compare(password, user.password);
+    if (!isValidPass) return res.status(400).json({ "msg": "Email and Password Doesn't match" });
 
-    // compare password
-    if (user.password === password) {
-        console.log('password match');
-    } else {
-        console.log('doesn\'t match');
-    }
-
-    res.send(value);
+    res.json({
+        "msg": "you are logged in"
+    });
 
     res.end();
 });
