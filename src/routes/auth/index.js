@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 // * VALIDATION
 const { registerUserValidation, loginUserValidation, generateToken } = require('../../helper/validation');
-const verifyToken = require('../../middlewares/verifyToken');
+const { isLoggedIn } = require('../../middlewares/auth');
 
 // * MODEL
 const User = require('../../models/user');
@@ -73,7 +73,7 @@ router.post('/login', async (req, res) => {
 
 
 // * this is just a test route
-router.get('/secret', verifyToken, (req, res) => {
+router.get('/secret', isLoggedIn, (req, res) => {
     res.status(200).json({ "msg": "I am Secret" });
 });
 
