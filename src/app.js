@@ -22,6 +22,7 @@ app.use(cors());
 // * ROUTES MIDDLEWARES
 // app.use('/api', require('./routes')); this is not gone a work
 app.use('/auth', require('./routes/auth'));
+app.use('/api/course', require('./routes/course'));
 
 // * ROUTES
 app.get('/', (req, res) => {

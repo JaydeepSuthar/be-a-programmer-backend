@@ -5,6 +5,7 @@ module.exports.registerUserValidation = (data) => {
     const registerUserSchema = Joi.object({
         name: Joi.string().min(3).max(20).required(),
         email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'io', 'dev'] } }).required(),
+        contact: Joi.string().length(10).pattern(/^[0-9]+$/).messages({ 'string.pattern.base': `Phone number must have 10 digits.` }).required(),
         password: Joi.string().min(6).max(16).required(),
     });
 
@@ -22,6 +23,6 @@ module.exports.loginUserValidation = (data) => {
 };
 
 
-module.exports.generateToken = (userId) => {
-    return jwt.sign({ _id: userId }, process.env.TOKEN_SECRET, { expiresIn: 60 });
+module.exports.generateToken = (userId, role) => {
+    return jwt.sign({ userId, role }, process.env.TOKEN_SECRET, { expiresIn: 60 });
 };

@@ -11,10 +11,10 @@ const User = require('../../models/user');
 // * SIGNUP ROUTE
 router.post('/signup', async (req, res) => {
 
-    const { name, email, password } = req.body;
+    const { name, email, contact, password } = req.body;
 
     // * check data is valid
-    const { error, value } = registerUserValidation({ name, email, password });
+    const { error, value } = registerUserValidation({ name, email, contact, password });
     if (error) return res.status(400).json({ 'error': error.details[0].message });
 
     // check user email already exists
@@ -28,6 +28,7 @@ router.post('/signup', async (req, res) => {
     const user = new User({
         name: name,
         email: email.toLowerCase(),
+        contact: contact,
         password: hashedPassword
     });
 
@@ -53,7 +54,7 @@ router.post('/login', async (req, res) => {
     if (error) return res.status(400).json({ 'error': error.details[0].message });
 
     // Check email and password is valid
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email }).lean();
     if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
 
     // check password hash is valid
@@ -61,11 +62,14 @@ router.post('/login', async (req, res) => {
     if (!isValidPass) return res.status(400).json({ "msg": "Email and Password Doesn't match" });
 
     // const token = jwt.sign
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
 
+    res.header("authorization", token);
+    // res.set
     res.json({
         "msg": "you are logged in",
-        token
+        "role": user.role
+        // token
     });
 
     res.end();
