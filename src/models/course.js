@@ -11,14 +11,9 @@ const CourseSchema = new Schema({
         required: true
     },
 
-    short_description: {
+    description: {
         type: String,
         required: true
-    },
-
-    long_description: {
-        type: String,
-        // required: true
     },
 
     thubmnail: {
@@ -38,7 +33,7 @@ const CourseSchema = new Schema({
         default: false
     },
 
-    insctructor: {
+    instructor: {
         type: String,
         required: true
     },
