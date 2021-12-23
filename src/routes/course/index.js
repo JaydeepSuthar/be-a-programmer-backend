@@ -12,18 +12,19 @@ router.get('/', (req, res) => {
 });
 
 // * create course
-router.post('/create', isLoggedIn, isAdmin, (req, res) => {
+router.post('/add', isLoggedIn, isAdmin, (req, res) => {
     res.status(200).json({ "msg": "course created" });
 });
 
 // * edit course
-router.put('/edit/:id', isLoggedIn, isAdmin, (req, res) => {
+router.put('/update/:id', isLoggedIn, isAdmin, (req, res) => {
     res.status(200).json({ "msg": "course edited" });
 });
 
 // * delete course
-router.delete('/remove'), isLoggedIn, isAdmin, (req, res) => {
-    res.status(200).json({ "msg": "course deleted" });
-};
+router.delete('/remove/:id', isLoggedIn, isAdmin, (req, res) => {
+    const { id } = req.params;
+    res.status(200).json({ "msg": `${id} is deleted` });
+});
 
 module.exports = router;

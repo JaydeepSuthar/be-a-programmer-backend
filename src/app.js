@@ -29,7 +29,6 @@ app.get('/', (req, res) => {
     res.send({ msg: 'hello programmeres' });
 });
 
-
 // *! 404 ERROR PAGE THIS MUST BE A THE END AFTER ALL ROUTES
 app.use('*', (req, res) => {
     res.status(404).json({

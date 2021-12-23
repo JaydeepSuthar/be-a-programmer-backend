@@ -81,4 +81,8 @@ router.get('/secret', isLoggedIn, (req, res) => {
     res.status(200).json({ "msg": "I am Secret" });
 });
 
+router.delete('/del/:id', (req, res) => {
+    res.send('user deleted');
+});
+
 module.exports = router;
