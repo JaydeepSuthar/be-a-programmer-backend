@@ -24,5 +24,5 @@ module.exports.loginUserValidation = (data) => {
 
 
 module.exports.generateToken = (userId, role) => {
-    return jwt.sign({ userId, role }, process.env.TOKEN_SECRET, { expiresIn: '5m' });
+    return jwt.sign({ userId, role }, process.env.TOKEN_SECRET, { expiresIn: `${process.env.TOKEN_EXPIRY_TIME}m` });
 };

@@ -11,7 +11,7 @@ const User = require('../../models/user');
 // * SIGNUP ROUTE
 router.post('/signup', async (req, res) => {
 
-    const { name, email, contact, password } = req.body;
+    const { name, email, contact, password, role, is_authenticatd, is_pro_subscriber, verify_token } = req.body;
 
     // * check data is valid
     const { error, value } = registerUserValidation({ name, email, contact, password });

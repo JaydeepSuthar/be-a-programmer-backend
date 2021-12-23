@@ -16,7 +16,7 @@ const CourseSchema = new Schema({
         required: true
     },
 
-    thubmnail: {
+    thumbnail: {
         type: String,
         required: true
     },
@@ -34,11 +34,11 @@ const CourseSchema = new Schema({
     },
 
     instructor: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'users'
     },
 
-    vidoes: [
+    videos: [
         {
             title: {
                 type: String,

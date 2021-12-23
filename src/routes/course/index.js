@@ -7,21 +7,106 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 const Course = require('../../models/course');
 
 // * get all course
-router.get('/', (req, res) => {
-    res.status(200).json({ "msg": "all courses" });
+router.get('/', async (req, res) => {
+
+    try {
+        const courses = await Course.find({}, { title: 1, thumbnail: 1, description: 1 }).limit(5).lean();
+        res.json(courses);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+
 });
 
 // * create course
-router.post('/add', isLoggedIn, isAdmin, (req, res) => {
+router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
-    const { title, slug, description, thumbnail, instructor, videos } = req.body;
+    const { title, slug, description, thumbnail, instructor, is_public, is_free, videos } = req.body;
 
-    res.status(200).json(req.body);
+    console.log(videos);
+
+    // * validate data
+
+    // * check course already exists
+
+    // * saving it in db
+    const course = new Course({
+        title,
+        slug,
+        description,
+        thumbnail,
+        instructor,
+        is_free,
+        is_public,
+        videos: [...videos]
+    });
+
+    try {
+        const newCourse = await course.save();
+        res.json({
+            msg: "Course Created",
+            "Course ID": newCourse._id
+        });
+    } catch (err) {
+        res.status(400).json(err);
+    }
+
 });
 
 // * edit course
-router.put('/update/:id', isLoggedIn, isAdmin, (req, res) => {
-    res.status(200).json({ "msg": "course edited" });
+router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
+    // res.status(200).json({ "msg": "course edited" });
+
+    const { title, slug, description, thumbnail, instructor, is_public, is_free, videos } = req.body;
+    const { course_id } = req.params;
+
+    // * check course exists or not
+    let course = await Course.findOne({ _id: course_id }).lean();
+    if (!course) return res.status(400).json({ "msg": "Course Not Found" });
+
+    // * update
+    try {
+        const updatedCourse = await Course.updateOne({ _id: course_id },
+            {
+                title,
+                // slug,
+                // description,
+                // thumbnail,
+                // instructor,
+                // is_free,
+                // is_public,
+                // videos: [...videos]
+            }
+        );
+        res.json({
+            msg: "Course Updated",
+            "Course ID": updatedCourse._id
+        });
+    } catch (err) {
+        res.status(400).json(err);
+    }
+
+    // course = Course({
+    //     title,
+    //     slug,
+    //     description,
+    //     thumbnail,
+    //     instructor,
+    //     is_free,
+    //     is_public,
+    //     videos: [videos]
+    // });
+
+    // try {
+    //     const updatedCourse = await course.save();
+    //     res.json({
+    //         msg: "Course Updated",
+    //         "Course ID": updatedCourse._id
+    //     });
+    // } catch (err) {
+    //     res.status(400).json(err);
+    // }
+
 });
 
 // * delete course
