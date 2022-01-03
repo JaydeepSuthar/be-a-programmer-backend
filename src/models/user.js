@@ -23,30 +23,20 @@ const UserSchema = new Schema({
         required: true
     },
 
-    role: {
-        type: Number,
-        required: true,
-        default: 2
-    },
-
     is_authenticated: {
         type: Boolean,
         required: true,
         default: false
     },
 
-    is_pro_subscriber: {
-        type: Boolean,
-        required: true,
-        default: false
+    qualification: {
+        type: String,
+        enum: ['higher_secondary', 'under_graduate', 'post_graduate']
     },
 
-    verify_token: String,
-
-    courses: [{
-        type: Schema.Types.ObjectId,
-        ref: 'courses'
-    }]
-}, { timestamps: true }, { collection: "users" });
+    address: {
+        type: String
+    }
+}, { timestamps: true }, { collection: "Users" });
 
 module.exports = model('user', UserSchema);

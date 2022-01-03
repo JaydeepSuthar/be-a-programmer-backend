@@ -9,12 +9,7 @@ const Course = require('../../models/course');
 // * get all course
 router.get('/', async (req, res) => {
 
-    try {
-        const courses = await Course.find({}, { title: 1, thumbnail: 1, description: 1 }).limit(5).lean();
-        res.json(courses);
-    } catch (err) {
-        res.status(400).json(err);
-    }
+    res.end();
 
 });
 
@@ -57,27 +52,16 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
     // res.status(200).json({ "msg": "course edited" });
 
-    const { title, slug, description, thumbnail, instructor, is_public, is_free, videos } = req.body;
+    // * const { title, slug, description, thumbnail, instructor, is_public, is_free, videos } = req.body;
     const { course_id } = req.params;
 
     // * check course exists or not
-    let course = await Course.findOne({ _id: course_id }).lean();
+    const course = await Course.findOne({ _id: course_id }).lean();
     if (!course) return res.status(400).json({ "msg": "Course Not Found" });
 
     // * update
     try {
-        const updatedCourse = await Course.updateOne({ _id: course_id },
-            {
-                title,
-                // slug,
-                // description,
-                // thumbnail,
-                // instructor,
-                // is_free,
-                // is_public,
-                // videos: [...videos]
-            }
-        );
+        const updatedCourse = await Course.updateOne({ _id: course_id }, req.body);
         res.json({
             msg: "Course Updated",
             "Course ID": updatedCourse._id
@@ -86,33 +70,24 @@ router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
         res.status(400).json(err);
     }
 
-    // course = Course({
-    //     title,
-    //     slug,
-    //     description,
-    //     thumbnail,
-    //     instructor,
-    //     is_free,
-    //     is_public,
-    //     videos: [videos]
-    // });
-
-    // try {
-    //     const updatedCourse = await course.save();
-    //     res.json({
-    //         msg: "Course Updated",
-    //         "Course ID": updatedCourse._id
-    //     });
-    // } catch (err) {
-    //     res.status(400).json(err);
-    // }
-
 });
 
 // * delete course
-router.delete('/remove/:id', isLoggedIn, isAdmin, (req, res) => {
-    const { id } = req.params;
-    res.status(200).json({ "msg": `${id} is deleted` });
+router.delete('/remove/:course_id', isLoggedIn, isAdmin, async (req, res) => {
+    const { course_id } = req.params;
+
+    if (!course_id) return res.status(400).json({ msg: "Please provide valid course id" });
+
+    // * check course exists or not
+    const course = await Course.findOne({ _id: course_id }).lean();
+    if (!course) return res.status(400).json({ "msg": "Course Not Found" });
+
+    try {
+        const deletedCourse = await Course.deleteOne({ _id: course_id });
+        res.status(200).json(deletedCourse);
+    } catch (err) {
+        res.status(400).json(err);
+    }
 });
 
 module.exports = router;

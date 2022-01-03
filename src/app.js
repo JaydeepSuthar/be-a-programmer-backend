@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 // * DB
-connect(process.env.MONGO_URI, console.log(`DB CONNECTED`));
+// connect(process.env.MONGO_URI, console.log(`DB CONNECTED`));
 
 // * MIDDLEWARES
 app.use(express.json());
@@ -20,8 +20,7 @@ app.use(helmet());
 app.use(cors());
 
 // * ROUTES MIDDLEWARES
-// app.use('/api', require('./routes')); this is not gone a work
-app.use('/auth', require('./routes/auth'));
+app.use('/api/user', require('./routes/user'));
 app.use('/api/course', require('./routes/course'));
 
 // * ROUTES

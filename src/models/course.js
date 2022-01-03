@@ -21,7 +21,20 @@ const CourseSchema = new Schema({
         required: true
     },
 
-    is_free: {
+    price: {
+        type: Number,
+        required: true
+    },
+
+    duration: {
+        type: Number
+    },
+
+    requirement: {
+        type: String
+    },
+
+    is_active: {
         type: Boolean,
         required: true,
         default: false
@@ -53,6 +66,6 @@ const CourseSchema = new Schema({
             }
         }
     ]
-}, { timestamps: true }, { collection: "courses" });
+}, { timestamps: true }, { collection: "Courses" });
 
 module.exports = model('course', CourseSchema);
