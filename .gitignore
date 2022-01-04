@@ -104,5 +104,6 @@ dist
 .tern-port
 
 # Test File
+helper/
 progress.md
 dbschema.json

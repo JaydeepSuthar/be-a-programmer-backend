@@ -42,15 +42,14 @@ router.post('/login', async (req, res) => {
 
     // const token = jwt.sign
     // ! solve the role error
-    const token = generateToken(user.id, user.role);
+    const token = generateToken(user.id, "student");
 
     res.header("authorization", token);
-    // res.json({
-    //     "msg": "you are logged in",
-    //     "id": user.id,
-    //     "role": user.role
-    // });
-    res.send('Data received:\n' + JSON.stringify(req.body));
+    res.json({
+        "msg": "you are logged in",
+        "id": user.id,
+        "role": "student"
+    });
     // res.end();
 });
 

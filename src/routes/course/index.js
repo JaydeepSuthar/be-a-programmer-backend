@@ -6,46 +6,64 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 // * MODEL
 const Course = require('../../models/course');
 
-// * get all course
+// * Prisma
+const prisma = require('../../helper/prisma');
+
+// * get all public course
 router.get('/', async (req, res) => {
 
+    try {
+        const allPublicCourses = await prisma.course_details.findMany({
+            where: { is_active: true },
+            orderBy: [
+                {
+                    created_at: 'desc'
+                }
+            ],
+            select: { id: true, title: true, thumbnail: true, price: true },
+            take: 5
+        });
+        res.json(allPublicCourses);
+    } catch (err) {
+        res.status(400).json(`Error Occur in ${err}`);
+    }
     res.end();
-
 });
 
 // * create course
 router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
-    const { title, slug, description, thumbnail, instructor, is_public, is_free, videos } = req.body;
-
-    console.log(videos);
+    const { title, slug, description, thumbnail, price, duration, requirement, is_active, adminId } = req.body;
 
     // * validate data
 
     // * check course already exists
 
     // * saving it in db
-    const course = new Course({
-        title,
-        slug,
-        description,
-        thumbnail,
-        instructor,
-        is_free,
-        is_public,
-        videos: [...videos]
-    });
+    const courseData = {
+        title: title,
+        slug: slug,
+        description: description,
+        thumbnail: thumbnail,
+        price: price,
+        duration: duration || "",
+        requirement: requirement || "",
+        is_active: is_active,
+        adminId: adminId
+    };
 
     try {
-        const newCourse = await course.save();
+        const newCourse = await prisma.course_details.create({
+            data: courseData,
+        });
         res.json({
-            msg: "Course Created",
-            "Course ID": newCourse._id
+            msg: `Course Created\nID: ${newCourse.id}`
         });
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json(`Error Occur ${err}`);
     }
 
+    res.end();
 });
 
 // * edit course

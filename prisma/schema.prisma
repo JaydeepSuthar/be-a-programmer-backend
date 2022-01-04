@@ -120,9 +120,9 @@ model Course_details {
   whishlist   Whistlist[]
 
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @updatedAt
   admin      Admin?   @relation(fields: [adminId], references: [id])
-  adminId    String?  @unique @db.ObjectId
+  adminId    String?  @db.ObjectId
 }
 
 model Discount_coupon {
@@ -218,6 +218,7 @@ model Users {
   is_authenticated Boolean             @default(false)
   qualification    users_qualification
   address          String?
+  // role
 
   assignment_complete Assigment_complete[]
   auth_token          Auth_token[]
