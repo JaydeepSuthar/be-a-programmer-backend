@@ -39,5 +39,8 @@
     "@types/express": "^4.17.13",
     "@types/node": "^16.11.11",
     "prisma": "^3.7.0"
+  },
+  "nodemonConfig": {
+    "ext": "js, html"
   }
 }

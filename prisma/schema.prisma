@@ -1,0 +1,263 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum admin_role {
+  admin
+  instructor
+}
+
+enum transactions_status {
+  in_process
+  success
+  failed
+}
+
+enum users_qualification {
+  higher_secondary
+  under_graduate
+  post_graduate
+}
+
+model Admin {
+  id       String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name     String
+  email    String
+  password String
+  role     admin_role @default(instructor)
+
+  posts   Blog[]
+  courses Course_details[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Assigment_complete {
+  id            String       @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  usersId       String?      @db.ObjectId
+  Users         Users?       @relation(fields: [usersId], references: [id])
+  assignmentsId String?      @db.ObjectId
+  Assignments   Assignments? @relation(fields: [assignmentsId], references: [id])
+}
+
+model Assignments {
+  id                  String               @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  chaptersId          String               @db.ObjectId
+  src                 String
+  is_visible          Boolean              @default(true)
+  created_at          DateTime             @default(now())
+  Chapters            Chapters             @relation(fields: [chaptersId], references: [id])
+  assignemnt_complete Assigment_complete[]
+}
+
+model Auth_token {
+  id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  token   String
+  Users   Users  @relation(fields: [usersId], references: [id])
+  usersId String @db.ObjectId
+}
+
+model Blog {
+  id         String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  title      String   @unique
+  slug       String   @unique
+  body       String
+  thumbnail  String
+  tags       String?
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  admin      Admin?   @relation(fields: [adminId], references: [id])
+  adminId    String?  @unique @db.ObjectId
+}
+
+model Cart {
+  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String         @db.ObjectId
+  Users            Users          @relation(fields: [usersId], references: [id])
+  usersId          String         @db.ObjectId
+}
+
+model Chapters {
+  id           String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  srno         Int
+  chapter_name String
+  is_visible   Boolean @default(true)
+
+  assignments Assignments[]
+  videos      Videos[]
+
+  created_at       DateTime       @default(now())
+  Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String         @db.ObjectId
+}
+
+model Course_details {
+  id          String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  title       String
+  slug        String
+  description String
+  thumbnail   String
+  price       Float
+  duration    String?
+  requirement String?
+  is_active   Boolean @default(false)
+
+  cart        Cart[]
+  chapters    Chapters[]
+  exams       Exams[]
+  order_items Order_items[]
+  questions   Questions[]
+  reviews     Reviews[]
+  whishlist   Whistlist[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+  admin      Admin?   @relation(fields: [adminId], references: [id])
+  adminId    String?  @unique @db.ObjectId
+}
+
+model Discount_coupon {
+  id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  coupon_code String   @unique
+  valid_till  DateTime
+  created_at  DateTime @default(now())
+}
+
+model Exam_complete {
+  id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  total_marks  Int
+  completed_on DateTime @default(now())
+  exams        Exams    @relation(fields: [examsId], references: [id])
+  examsId      String   @db.ObjectId
+  Users        Users?   @relation(fields: [usersId], references: [id])
+  usersId      String?  @db.ObjectId
+}
+
+model Exam_questions {
+  id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+
+  option_a       String   @unique
+  option_b       String   @unique
+  option_c       String   @unique
+  correct_answer String
+  created_at     DateTime @default(now())
+  exams          Exams    @relation(fields: [examsId], references: [id])
+  examsId        String   @db.ObjectId
+}
+
+model Exams {
+  id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+
+  exam_questions Exam_questions[]
+  exam_complete  Exam_complete[]
+
+  created_at       DateTime       @default(now())
+  course_details   Course_details @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String         @db.ObjectId
+}
+
+model Order_items {
+  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String         @db.ObjectId
+  Transactions     Transactions   @relation(fields: [transactionsId], references: [id])
+  transactionsId   String         @db.ObjectId
+}
+
+model Questions {
+  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  question         String
+  reply            String
+  created_at       DateTime       @default(now())
+  Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String         @db.ObjectId
+  Users            Users?         @relation(fields: [usersId], references: [id])
+  usersId          String?        @db.ObjectId
+}
+
+model Reviews {
+  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  review           String
+  is_approved      Boolean
+  created_at       DateTime       @default(now())
+  Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String         @db.ObjectId
+  Users            Users          @relation(fields: [usersId], references: [id])
+  usersId          String         @db.ObjectId
+}
+
+model Transactions {
+  id                  String              @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  order_no            String              @unique
+  razorpay_order_id   String
+  razorpay_payment_id String
+  razorpay_signature  String
+  status              transactions_status @default(in_process)
+  purchase_date       DateTime            @default(now())
+
+  users       Users         @relation(fields: [usersId], references: [id])
+  order_items Order_items[]
+  usersId     String        @db.ObjectId
+}
+
+model Users {
+  id               String              @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name             String
+  email            String              @unique
+  contact          String
+  password         String
+  is_authenticated Boolean             @default(false)
+  qualification    users_qualification
+  address          String?
+
+  assignment_complete Assigment_complete[]
+  auth_token          Auth_token[]
+  cart                Cart[]
+  exam_complete       Exam_complete[]
+  questions           Questions[]
+  reviews             Reviews[]
+  video_watched       Video_watched[]
+  whishlist           Whistlist[]
+
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+  Transactions Transactions[]
+}
+
+model Video_watched {
+  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  Users    Users  @relation(fields: [usersId], references: [id])
+  usersId  String @db.ObjectId
+  Videos   Videos @relation(fields: [videosId], references: [id])
+  videosId String @db.ObjectId
+}
+
+model Videos {
+  id         String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  srno       Int
+  src        String
+  is_visible Boolean
+
+  video_watched Video_watched[]
+
+  created_at DateTime @default(now())
+  Chapters   Chapters @relation(fields: [chaptersId], references: [id])
+  chaptersId String   @db.ObjectId
+}
+
+model Whistlist {
+  id               String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  Course_details   Course_details? @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String?         @db.ObjectId
+  Users            Users?          @relation(fields: [usersId], references: [id])
+  usersId          String?         @db.ObjectId
+}

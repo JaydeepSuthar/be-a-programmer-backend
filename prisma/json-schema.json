@@ -1,0 +1,848 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Admin": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "default": "instructor",
+          "enum": [
+            "admin",
+            "instructor"
+          ]
+        },
+        "posts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Blog"
+          }
+        },
+        "courses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Course_details"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Assigment_complete": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "Users": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Users"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usersId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Assignments": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "chapter": {
+          "type": "integer"
+        },
+        "src": {
+          "type": "string"
+        },
+        "is_visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Chapters": {
+          "$ref": "#/definitions/Chapters"
+        },
+        "chaptersId": {
+          "type": "string"
+        }
+      }
+    },
+    "Auth_token": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "Users": {
+          "$ref": "#/definitions/Users"
+        },
+        "usersId": {
+          "type": "string"
+        }
+      }
+    },
+    "Blog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "tags": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_active": {
+          "type": "boolean",
+          "default": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "admin": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Admin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adminId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Cart": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "Course_details": {
+          "$ref": "#/definitions/Course_details"
+        },
+        "course_detailsId": {
+          "type": "string"
+        },
+        "Users": {
+          "$ref": "#/definitions/Users"
+        },
+        "usersId": {
+          "type": "string"
+        }
+      }
+    },
+    "Chapters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "srno": {
+          "type": "integer"
+        },
+        "chapter_name": {
+          "type": "string"
+        },
+        "is_visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Assignments"
+          }
+        },
+        "videos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Videos"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Course_details": {
+          "$ref": "#/definitions/Course_details"
+        },
+        "course_detailsId": {
+          "type": "string"
+        }
+      }
+    },
+    "Course_details": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "duration": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requirement": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_active": {
+          "type": "boolean",
+          "default": false
+        },
+        "cart": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Cart"
+          }
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chapters"
+          }
+        },
+        "exams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Exams"
+          }
+        },
+        "order_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Order_items"
+          }
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Questions"
+          }
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reviews"
+          }
+        },
+        "whishlist": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Whistlist"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "admin": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Admin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adminId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Discount_coupon": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "coupon_code": {
+          "type": "string"
+        },
+        "valid_till": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Exam_complete": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "total_marks": {
+          "type": "integer"
+        },
+        "completed_on": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exams": {
+          "$ref": "#/definitions/Exams"
+        },
+        "examsId": {
+          "type": "string"
+        },
+        "Users": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Users"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usersId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Exam_questions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "option_a": {
+          "type": "string"
+        },
+        "option_b": {
+          "type": "string"
+        },
+        "option_c": {
+          "type": "string"
+        },
+        "correct_answer": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exams": {
+          "$ref": "#/definitions/Exams"
+        },
+        "examsId": {
+          "type": "string"
+        }
+      }
+    },
+    "Exams": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "exam_questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Exam_questions"
+          }
+        },
+        "exam_complete": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Exam_complete"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "course_details": {
+          "$ref": "#/definitions/Course_details"
+        },
+        "course_detailsId": {
+          "type": "string"
+        }
+      }
+    },
+    "Order_items": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "Course_details": {
+          "$ref": "#/definitions/Course_details"
+        },
+        "course_detailsId": {
+          "type": "string"
+        },
+        "Transactions": {
+          "$ref": "#/definitions/Transactions"
+        },
+        "transactionsId": {
+          "type": "string"
+        }
+      }
+    },
+    "Questions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "reply": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Course_details": {
+          "$ref": "#/definitions/Course_details"
+        },
+        "course_detailsId": {
+          "type": "string"
+        },
+        "Users": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Users"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usersId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Reviews": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "review": {
+          "type": "string"
+        },
+        "is_approved": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Course_details": {
+          "$ref": "#/definitions/Course_details"
+        },
+        "course_detailsId": {
+          "type": "string"
+        },
+        "Users": {
+          "$ref": "#/definitions/Users"
+        },
+        "usersId": {
+          "type": "string"
+        }
+      }
+    },
+    "Transactions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "order_no": {
+          "type": "string"
+        },
+        "razorpay_order_id": {
+          "type": "string"
+        },
+        "razorpay_payment_id": {
+          "type": "string"
+        },
+        "razorpay_signature": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "default": "in_process",
+          "enum": [
+            "in_process",
+            "success",
+            "failed"
+          ]
+        },
+        "purchase_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "users": {
+          "$ref": "#/definitions/Users"
+        },
+        "order_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Order_items"
+          }
+        },
+        "usersId": {
+          "type": "string"
+        }
+      }
+    },
+    "Users": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "is_authenticated": {
+          "type": "boolean",
+          "default": false
+        },
+        "qualification": {
+          "type": "string",
+          "enum": [
+            "higher_secondary",
+            "under_graduate",
+            "post_graduate"
+          ]
+        },
+        "address": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assignment_complete": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Assigment_complete"
+          }
+        },
+        "auth_token": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Auth_token"
+          }
+        },
+        "cart": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Cart"
+          }
+        },
+        "exam_complete": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Exam_complete"
+          }
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Questions"
+          }
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reviews"
+          }
+        },
+        "video_watched": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Video_watched"
+          }
+        },
+        "whishlist": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Whistlist"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Transactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Transactions"
+          }
+        }
+      }
+    },
+    "Video_watched": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "Users": {
+          "$ref": "#/definitions/Users"
+        },
+        "usersId": {
+          "type": "string"
+        },
+        "Videos": {
+          "$ref": "#/definitions/Videos"
+        },
+        "videosId": {
+          "type": "string"
+        }
+      }
+    },
+    "Videos": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "srno": {
+          "type": "integer"
+        },
+        "chapter": {
+          "type": "integer"
+        },
+        "src": {
+          "type": "string"
+        },
+        "is_visible": {
+          "type": "boolean"
+        },
+        "video_watched": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Video_watched"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Chapters": {
+          "$ref": "#/definitions/Chapters"
+        },
+        "chaptersId": {
+          "type": "string"
+        }
+      }
+    },
+    "Whistlist": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "Course_details": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Course_details"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "course_detailsId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Users": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Users"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usersId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "admin": {
+      "$ref": "#/definitions/Admin"
+    },
+    "assigment_complete": {
+      "$ref": "#/definitions/Assigment_complete"
+    },
+    "assignments": {
+      "$ref": "#/definitions/Assignments"
+    },
+    "auth_token": {
+      "$ref": "#/definitions/Auth_token"
+    },
+    "blog": {
+      "$ref": "#/definitions/Blog"
+    },
+    "cart": {
+      "$ref": "#/definitions/Cart"
+    },
+    "chapters": {
+      "$ref": "#/definitions/Chapters"
+    },
+    "course_details": {
+      "$ref": "#/definitions/Course_details"
+    },
+    "discount_coupon": {
+      "$ref": "#/definitions/Discount_coupon"
+    },
+    "exam_complete": {
+      "$ref": "#/definitions/Exam_complete"
+    },
+    "exam_questions": {
+      "$ref": "#/definitions/Exam_questions"
+    },
+    "exams": {
+      "$ref": "#/definitions/Exams"
+    },
+    "order_items": {
+      "$ref": "#/definitions/Order_items"
+    },
+    "questions": {
+      "$ref": "#/definitions/Questions"
+    },
+    "reviews": {
+      "$ref": "#/definitions/Reviews"
+    },
+    "transactions": {
+      "$ref": "#/definitions/Transactions"
+    },
+    "users": {
+      "$ref": "#/definitions/Users"
+    },
+    "video_watched": {
+      "$ref": "#/definitions/Video_watched"
+    },
+    "videos": {
+      "$ref": "#/definitions/Videos"
+    },
+    "whistlist": {
+      "$ref": "#/definitions/Whistlist"
+    }
+  }
+}
