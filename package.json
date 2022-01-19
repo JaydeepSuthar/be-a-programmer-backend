@@ -9,7 +9,7 @@
     "start": "node src/app.js"
   },
   "engines": {
-    "node": "16.5.0"
+    "node": "16.13.1"
   },
   "repository": {
     "type": "git",
@@ -31,8 +31,7 @@
     "joi": "17.5.0",
     "jsonwebtoken": "8.5.1",
     "mongoose": "6.0.14",
-    "morgan": "1.10.0",
-    "nunjucks": "^3.2.3"
+    "morgan": "1.10.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

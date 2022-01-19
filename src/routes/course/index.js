@@ -68,26 +68,45 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
 // * edit course
 router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
-    // res.status(200).json({ "msg": "course edited" });
 
-    // * const { title, slug, description, thumbnail, instructor, is_public, is_free, videos } = req.body;
-    const { course_id } = req.params;
+    const { title, slug, description, thumbnail, price, duration, requirement, is_active, adminId } = req.body;
 
-    // * check course exists or not
-    const course = await Course.findOne({ _id: course_id }).lean();
-    if (!course) return res.status(400).json({ "msg": "Course Not Found" });
+    if (!course_id) return res.status(400).json({ msg: "Please provide valid course id" });
+
+    // * validate data
+
+    // * check course already exists
+
+    // * saving it in db
+    const courseData = {
+        title: title,
+        slug: slug,
+        description: description,
+        thumbnail: thumbnail,
+        price: price,
+        duration: duration || "",
+        requirement: requirement || "",
+        is_active: is_active,
+        adminId: adminId
+    };
 
     // * update
     try {
-        const updatedCourse = await Course.updateOne({ _id: course_id }, req.body);
+        const updatedCourse = await prisma.course_details.update({
+            where: {
+                id: course_id
+            },
+            data: courseData
+        });
         res.json({
             msg: "Course Updated",
-            "Course ID": updatedCourse._id
+            "Course ID": updatedCourse.id
         });
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json(`Error Occur ${err}`);
     }
 
+    res.end();
 });
 
 // * delete course
