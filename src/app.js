@@ -11,14 +11,15 @@ const { connect } = require('mongoose');
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.use(express.urlencoded({ extended: false }));
-
 // * MIDDLEWARES
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
 app.use(helmet());
 app.use(cors());
+
+// * STATIC FILES
+app.use('/static', express.static('public'));
 
 // * ROUTES MIDDLEWARES
 app.use('/api/user', require('./routes/user'));
@@ -26,15 +27,15 @@ app.use('/api/course', require('./routes/course'));
 
 // * ROUTES
 app.get('/', (req, res) => {
-    //    res.render('pages/home.html');
-    res.json({ msg: "Hello from backend" });
+	//    res.render('pages/home.html');
+	res.json({ msg: "Hello from backend" });
 });
 
 // *! 404 ERROR PAGE THIS MUST BE A THE END AFTER ALL ROUTES
 app.use('*', (req, res) => {
-    res.status(404).json({
-        "Error": "Page Not Found"
-    });
+	res.status(404).json({
+		"Error": "Page Not Found"
+	});
 });
 
 // * SERVER
