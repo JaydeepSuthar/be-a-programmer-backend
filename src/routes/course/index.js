@@ -31,17 +31,22 @@ router.get('/', async (req, res) => {
 });
 
 // * get all courses with matching tags
-router.get('/tag/:tag_name', (req, res) => {
+router.get('/tag/:tag_name', async (req, res) => {
 	const tag = req.params.tag_name;
+
+	console.log(tag);
 
 	try {
 		const courses = await prisma.course_details.findMany({
 			where: {
-				tags: { contains: tag },
-				select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
-			}
+				tags: {
+					hasEvery: tag,
+				}
+			},
+			select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 		});
 		res.status(200).json(courses);
+		console.log(courses);
 	} catch (err) {
 		res.status(400).json(`Error Occur in ${err}`);
 	}
