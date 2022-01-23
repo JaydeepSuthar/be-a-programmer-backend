@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 				}
 			],
 			select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
-			take: 5
+			// take: 3,
 		});
 		res.json(allPublicCourses);
 	} catch (err) {
@@ -29,6 +29,21 @@ router.get('/', async (req, res) => {
 	}
 	res.end();
 });
+
+// * get all tags
+router.get('/tags', async (req, res) => {
+	try {
+		const tags = await prisma.course_details.findMany({
+			where: { is_active: true },
+			select: { id: true, tags: true },
+		});
+		res.status(200).json(tags);
+	} catch (err) {
+		res.status(400).json(`Error Occur in ${err}`);
+	}
+	res.end();
+});
+
 
 // * get all courses with matching tags
 router.get('/tag/:tag_name', async (req, res) => {
@@ -51,7 +66,7 @@ router.get('/tag/:tag_name', async (req, res) => {
 		res.status(400).json(`Error Occur in ${err}`);
 	}
 	res.end();
-})
+});
 
 // * get particular course
 router.get('/:course_id', async (req, res) => {
@@ -73,6 +88,7 @@ router.get('/:course_id', async (req, res) => {
 });
 
 // * create course
+// ! add validation and logged in middleware
 router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
 	const { title, slug, description, thumbnail, price, duration, requirement, is_active, adminId } = req.body;
@@ -87,22 +103,24 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 		slug: slug,
 		description: description,
 		thumbnail: thumbnail,
-		price: price,
+		price: parseFloat(price),
 		duration: duration || "",
 		requirement: requirement || "",
 		is_active: is_active,
-		adminId: adminId
+		adminId: adminId,
+		tags: ['web', 'node', 'js']
 	};
 
 	try {
 		const newCourse = await prisma.course_details.create({
 			data: courseData,
+			select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 		});
-		res.json({
-			msg: `Course Created\nID: ${newCourse.id}`
-		});
+		console.log(`Course Created\nID: ${{ newCourse }}`);
+		res.json(newCourse);
 	} catch (err) {
-		res.status(400).json(`Error Occur ${err}`);
+		// res.status(400).json(`Error Occur ${err}`);
+		console.error(`Error Occur ${err}`);
 	}
 
 	res.end();
