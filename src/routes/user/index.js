@@ -46,6 +46,7 @@ router.post('/login', async (req, res) => {
 
 		select: {
 			id: true,
+			name: true,
 			email: true,
 			password: true
 		}
@@ -56,15 +57,22 @@ router.post('/login', async (req, res) => {
 	const isValidPass = await bcrypt.compare(password, user.password);
 	if (!isValidPass) return res.status(400).json({ "msg": "Email and Password Doesn't match" });
 
+	delete user.password;
+
 	// const token = jwt.sign
 	// ! solve the role error
 	const token = generateToken(user.id, "student");
-
-	res.header("authorization", token);
+	const auth = {
+		token
+	}
+	const loggedInUser = {
+		...user,
+		role: 'student'
+	}
+	// res.header("authorization", token);
 	res.json({
-		"msg": "you are logged in",
-		"id": user.id,
-		"role": "student"
+		loggedInUser,
+		auth
 	});
 	// res.end();
 });

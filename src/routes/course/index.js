@@ -3,9 +3,6 @@ const router = require('express').Router();
 // * VALIDATION
 const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 
-// * MODEL
-const Course = require('../../models/course');
-
 // * Prisma
 const prisma = require('../../helper/prisma');
 
@@ -20,7 +17,7 @@ router.get('/', async (req, res) => {
 					created_at: 'desc'
 				}
 			],
-			select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
+			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 			// take: 3,
 		});
 		res.json(allPublicCourses);
@@ -58,7 +55,7 @@ router.get('/tag/:tag_name', async (req, res) => {
 					hasEvery: tag,
 				}
 			},
-			select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
+			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 		});
 		res.status(200).json(courses);
 		console.log(courses);
@@ -76,9 +73,9 @@ router.get('/:course_id', async (req, res) => {
 	try {
 		const course = await prisma.course_details.findFirst({
 			where: { is_active: true, id: course_id },
-			select: {
-				id: true, tags: true, description: true, thumbnail: true, title: true, price: true
-			}
+			// select: {
+			// 	id: true, tags: true, description: true, thumbnail: true, title: true, price: true
+			// }
 		});
 		res.status(200).json(course);
 	} catch (err) {
@@ -114,7 +111,7 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 	try {
 		const newCourse = await prisma.course_details.create({
 			data: courseData,
-			select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
+			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 		});
 		console.log(`Course Created\nID: ${{ newCourse }}`);
 		res.json(newCourse);
@@ -128,6 +125,8 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
 // * edit course
 router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
+
+	const course_id = req.params.course_id || 0;
 
 	const { title, slug, description, thumbnail, price, duration, requirement, is_active, adminId } = req.body;
 
@@ -143,7 +142,7 @@ router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 		slug: slug,
 		description: description,
 		thumbnail: thumbnail,
-		price: price,
+		price: parseFloat(price),
 		duration: duration || "",
 		requirement: requirement || "",
 		is_active: is_active,
@@ -156,14 +155,13 @@ router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 			where: {
 				id: course_id
 			},
-			data: courseData
+			data: courseData,
+			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 		});
-		res.json({
-			msg: "Course Updated",
-			"Course ID": updatedCourse.id
-		});
+		res.json(updatedCourse);
 	} catch (err) {
-		res.status(400).json(`Error Occur ${err}`);
+		// res.status(400).json(`Error Occur ${err}`);
+		console.log(`Error Occur ${err}`);
 	}
 
 	res.end();
@@ -171,19 +169,23 @@ router.put('/update/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 
 // * delete course
 router.delete('/remove/:course_id', isLoggedIn, isAdmin, async (req, res) => {
-	const { course_id } = req.params;
+
+	const course_id = req.params.course_id || 0;
 
 	if (!course_id) return res.status(400).json({ msg: "Please provide valid course id" });
 
 	// * check course exists or not
-	const course = await Course.findOne({ _id: course_id }).lean();
-	if (!course) return res.status(400).json({ "msg": "Course Not Found" });
+	// const course = await Course.findOne({ _id: course_id }).lean();
+	// if (!course) return res.status(400).json({ "msg": "Course Not Found" });
 
 	try {
-		const deletedCourse = await Course.deleteOne({ _id: course_id });
+		const deletedCourse = await prisma.course_details.delete({
+			where: { id: course_id },
+		});
 		res.status(200).json(deletedCourse);
 	} catch (err) {
-		res.status(400).json(err);
+		// res.status(400).json(err);
+		console.log(err);
 	}
 });
 

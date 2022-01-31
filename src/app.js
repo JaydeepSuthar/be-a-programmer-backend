@@ -1,11 +1,8 @@
 require('dotenv').config({ path: __dirname + `/../.env` });
 
 const express = require('express');
-const helmet = require('helmet');
 const logger = require('morgan');
 const cors = require('cors');
-const { connect } = require('mongoose');
-// const path = require('path');
 
 // * INIT
 const app = express();
@@ -15,8 +12,10 @@ const port = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
-app.use(helmet());
-app.use(cors());
+app.use(cors({
+	origin: ['http://localhost:3000'],
+	credentials: true
+}));
 
 // * STATIC FILES
 app.use('/static', express.static('public'));
@@ -27,7 +26,6 @@ app.use('/api/course', require('./routes/course'));
 
 // * ROUTES
 app.get('/', (req, res) => {
-	//    res.render('pages/home.html');
 	res.json({ msg: "Hello from backend" });
 });
 
