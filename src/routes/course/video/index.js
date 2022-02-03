@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs/promises');
 
 // * VALIDATION
 const { isLoggedIn, isAdmin } = require('../../../middlewares/auth');
 
 // * Prisma
 const prisma = require('../../../helper/prisma');
-const { runInNewContext } = require('vm');
 
 // * MULTER CONFIG
 const storage = multer.diskStorage({
@@ -36,10 +36,10 @@ const upload = multer({
  * @desc Add Single Video
  */
 
-router.post('/add', upload.single('video'), async (req, res) => {
+router.post('/add', isLoggedIn, isAdmin, upload.single('video'), async (req, res) => {
 
 	const filename = req.file.filename;
-	const { chapterId, courseId, srno, is_visible } = req.body || {};
+	const { chapterId, courseId, srno, title, is_visible } = req.body || {};
 
 	if (req.uploadError) console.log(req.uploadError.message);
 
@@ -49,6 +49,7 @@ router.post('/add', upload.single('video'), async (req, res) => {
 	// * CREATE VIDEO
 	const video = {
 		srno: parseInt(srno),
+		title: title,
 		src: filename,
 		is_visible: is_visible || true,
 		chaptersId: `61fbd6a30637ca1547b5fdb9`
@@ -81,9 +82,11 @@ router.get('/:video_id', async (req, res) => {
 				id: videoId
 			},
 			select: {
+				id: true,
 				srno: true,
 				title: true,
 				src: true,
+				chaptersId: true
 			}
 		});
 		res.status(200).json({ data: video });
@@ -94,5 +97,29 @@ router.get('/:video_id', async (req, res) => {
 	res.end();
 
 });
+
+/**
+ * @desc Edit Video
+ */
+
+router.put('/edit/:video_id', isLoggedIn, isAdmin, (req, res) => { });
+
+
+/**
+ * @desc Delete Video
+ */
+
+router.delete('/delete/:video_id', isLoggedIn, isAdmin, async (req, res) => {
+
+	const videoId = req.params.video_id || null;
+
+	// * delete video
+	const deletedVideo = await prisma.videos.delete({ where: { id: videoId } }).catch(err => console.log(err));
+
+	// * TODO: DELETE ACTUAL VIDEO FILE FROM FILE SYSTEM
+
+	res.status(200).json({ msg: `Video Deleted Successfully`, data: deletedVideo});
+});
+
 
 module.exports = router;
