@@ -23,6 +23,7 @@ app.use('/static', express.static('public'));
 // * ROUTES MIDDLEWARES
 app.use('/api/user', require('./routes/user'));
 app.use('/api/course', require('./routes/course'));
+app.use('/api/video', require('./routes/course/video'));
 
 // * ROUTES
 app.get('/', (req, res) => {

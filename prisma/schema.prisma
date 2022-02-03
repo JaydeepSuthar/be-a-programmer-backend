@@ -246,14 +246,15 @@ model Video_watched {
 model Videos {
     id         String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
     srno       Int
+    title      String
     src        String
     is_visible Boolean
 
     video_watched Video_watched[]
 
-    created_at DateTime @default(now())
-    Chapters   Chapters @relation(fields: [chaptersId], references: [id])
-    chaptersId String   @db.ObjectId
+    created_at DateTime  @default(now())
+    Chapters   Chapters? @relation(fields: [chaptersId], references: [id])
+    chaptersId String?   @db.ObjectId
 }
 
 model Whistlist {

@@ -107,3 +107,4 @@ dist
 helper/
 progress.md
 dbschema.json
+upload/
