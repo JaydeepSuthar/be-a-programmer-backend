@@ -33,6 +33,14 @@
 - [x] Update
 - [x] Delete
 
+5. Blog
+
+- [x] Get
+- [x] Add
+- [x] Update
+- [x] Delete
+
+
 ```
 This routes doesn't have data validation yet
 ```
