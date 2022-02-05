@@ -28,8 +28,8 @@ app.use('/api/video', require('./routes/course/video'));
 app.use('/api/chapter', require('./routes/course/chapter'));
 
 // * ROUTES
-app.get('/', (req, res) => {
-	res.json({ msg: "Hello from backend" });
+app.get('/api', (req, res) => {
+	res.json({ msg: `Hello from backend ${process.env.NODE_ENV}` });
 });
 
 // *! 404 ERROR PAGE THIS MUST BE A THE END AFTER ALL ROUTES

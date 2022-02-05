@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs/promises');
+const fs = require('fs');
 
 // * VALIDATION
 const { isLoggedIn, isAdmin } = require('../../../middlewares/auth');
@@ -41,8 +41,7 @@ router.post('/add', isLoggedIn, isAdmin, upload.single('video'), async (req, res
 	const filename = req.file.filename;
 	const { chapterId, courseId, srno, title, is_visible } = req.body || {};
 
-	if (req.uploadError) console.log(req.uploadError.message);
-
+	if (req.uploadError) return res.status(401).json({ error: `${req.uploadError}` });
 
 	// * Check weather chapter exists and if not create one
 
@@ -58,13 +57,11 @@ router.post('/add', isLoggedIn, isAdmin, upload.single('video'), async (req, res
 	try {
 		const newVideo = await prisma.videos.create({ data: video });
 		console.log(`New Video Created: ${newVideo.id}`);
-		res.status(200).json({ data: newVideo });
+		return res.status(200).json({ msg: `Video Uploaded Successfully`, data: newVideo });
 	} catch (err) {
 		console.error(`Error Occur: ${err}`);
+		return res.status(400).json({ error: `Something went wrong` });
 	}
-
-	// res.status(200).json({ msg: `video uploaded` });
-	res.end();
 });
 
 /**
@@ -92,6 +89,7 @@ router.get('/:video_id', async (req, res) => {
 		res.status(200).json({ data: video });
 	} catch (err) {
 		console.error(`Error Occur: ${err}`);
+		return res.status(400).json({ error: `Something went wrong` });
 	}
 
 	res.end();
@@ -102,7 +100,9 @@ router.get('/:video_id', async (req, res) => {
  * @desc Edit Video
  */
 
-router.put('/edit/:video_id', isLoggedIn, isAdmin, (req, res) => { });
+router.put('/edit/:video_id', isLoggedIn, isAdmin, (req, res) => {
+	return res.status(200).json({ msg: `Video updated Successfully` });
+});
 
 
 /**
@@ -114,11 +114,16 @@ router.delete('/delete/:video_id', isLoggedIn, isAdmin, async (req, res) => {
 	const videoId = req.params.video_id || null;
 
 	// * delete video
-	const deletedVideo = await prisma.videos.delete({ where: { id: videoId } }).catch(err => console.log(err));
-
-	// * TODO: DELETE ACTUAL VIDEO FILE FROM FILE SYSTEM
-
-	res.status(200).json({ msg: `Video Deleted Successfully`, data: deletedVideo});
+	try {
+		const deletedVideo = await prisma.videos.delete({ where: { id: videoId }, select: { src: true } });
+		console.log(deletedVideo);
+		const filePath = deletedVideo.src;
+		fs.unlinkSync(`upload/${filePath}`);
+		return res.status(200).json({ msg: `Video deleted Successfully` });
+	} catch (err) {
+		console.error(`Error Occur: ${err}`);
+		return res.status(400).json({ error: `Something went wrong` });
+	}
 });
 
 
