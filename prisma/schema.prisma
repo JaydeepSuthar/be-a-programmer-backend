@@ -75,7 +75,7 @@ model Blog {
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
     admin      Admin?   @relation(fields: [adminId], references: [id])
-    adminId    String?  @unique @db.ObjectId
+    adminId    String? @db.ObjectId
 }
 
 model Cart {
