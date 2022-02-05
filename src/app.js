@@ -24,6 +24,7 @@ app.use('/static', express.static('public'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/course', require('./routes/course'));
 app.use('/api/video', require('./routes/course/video'));
+app.use('/api/chapter', require('./routes/course/chapter'));
 
 // * ROUTES
 app.get('/', (req, res) => {
