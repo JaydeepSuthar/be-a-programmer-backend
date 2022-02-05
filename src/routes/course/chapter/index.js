@@ -31,7 +31,7 @@ router.get('/:chapter_id', async (req, res) => {
  * @desc Add Chapter
  */
 
-router.post('/add', async (req, res) => {
+router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
 	const { srno, chapter_name, is_visible, course_id } = req.body || '';
 
@@ -63,7 +63,7 @@ router.post('/add', async (req, res) => {
  * @desc Edit Chapter
  */
 
-router.put('/edit/:chapter_id', async (req, res) => {
+router.put('/edit/:chapter_id', isLoggedIn, isAdmin, async (req, res) => {
 
 	const { chapter_id } = req.params || 0;
 	const { srno, chapter_name, is_visible } = req.body;
@@ -92,7 +92,7 @@ router.put('/edit/:chapter_id', async (req, res) => {
  * @desc Delete Chapter
  */
 
-router.delete('/delete/:chapter_id', async (req, res) => {
+router.delete('/delete/:chapter_id', isLoggedIn, isAdmin, async (req, res) => {
 	const { chapter_id } = req.params || 0;
 
 	// * find and delete chapter
