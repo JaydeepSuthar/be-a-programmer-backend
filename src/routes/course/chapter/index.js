@@ -40,11 +40,9 @@ router.post('/add', async (req, res) => {
 	if (!courseExists) return res.status(409).json({ error: `Course Doesn't Exists` });
 
 	// * check chapter with same name exists in course
-	// FIXME: not working...
-	const chapterWithNameExists = await prisma.chapters.count({ where: { AND: { chapter_name: { contains: chapter_name }, id: course_id }   } });
+	const chapterWithNameExists = await prisma.chapters.count({ where: { AND: { chapter_name: { contains: chapter_name }, course_detailsId: course_id } } });
 	if (chapterWithNameExists) return res.status(409).json({ error: `Chapter with Same Name Exists` });
 
-	// FIXME: ERROR IN CREATING CHAPTER :: it's already fixed
 	// * add chapter
 	const chapter = {
 		srno: parseInt(srno),
