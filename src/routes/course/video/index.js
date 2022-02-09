@@ -32,6 +32,46 @@ const upload = multer({
 	}
 });
 
+
+/**
+ * @desc Get All Videos
+ */
+router.get('/', async (req, res) => {
+	try {
+		const videos = await prisma.videos.findMany({});
+		return res.status(200).json({ msg: `Video Found`, data: videos });
+	} catch (err) {
+		console.error(`Error Occur: ${err}`);
+		return res.status(400).json({ error: `Something went wrong` });
+	}
+});
+
+/**
+ * @desc Get Single Video
+ */
+
+router.get('/:video_id', async (req, res) => {
+	const videoId = req.params.video_id || null;
+
+	// * Check wheater video is exists
+
+	try {
+		const video = await prisma.videos.findUnique({
+			where: {
+				id: videoId
+			},
+			include: {
+				Chapters: true
+			}
+		});
+		return res.status(200).json({ msg: `Video Found`, data: video });
+	} catch (err) {
+		console.error(`Error Occur: ${err}`);
+		return res.status(400).json({ error: `Something went wrong` });
+	}
+});
+
+
 /**
  * @desc Add Single Video
  */
@@ -64,44 +104,45 @@ router.post('/add', isLoggedIn, isAdmin, upload.single('video'), async (req, res
 	}
 });
 
-/**
- * @desc Get Video
- */
-
-router.get('/:video_id', async (req, res) => {
-	const videoId = req.params.video_id || null;
-
-	// * Check wheater video is exists
-
-	try {
-		const video = await prisma.videos.findUnique({
-			where: {
-				id: videoId
-			},
-			select: {
-				id: true,
-				srno: true,
-				title: true,
-				src: true,
-				chaptersId: true
-			}
-		});
-		res.status(200).json({ data: video });
-	} catch (err) {
-		console.error(`Error Occur: ${err}`);
-		return res.status(400).json({ error: `Something went wrong` });
-	}
-
-	res.end();
-
-});
 
 /**
  * @desc Edit Video
  */
 
-router.put('/edit/:video_id', isLoggedIn, isAdmin, (req, res) => {
-	return res.status(200).json({ msg: `Video updated Successfully` });
+router.put('/edit/:video_id', isLoggedIn, isAdmin, upload.single('video'), async (req, res) => {
+
+	const { video_id } = req.params;
+	const { filename } = req.file || '';
+	const { srno, title, is_visible } = req.body || {};
+
+	if (req.uploadError) return res.status(401).json({ error: `${req.uploadError}` });
+
+	// * Check weather chapter exists and if not create one
+
+	// * CREATE VIDEO
+	const video = {
+		srno: srno,
+		title: title,
+		src: filename,
+		is_visible: is_visible,
+	};
+
+	try {
+		const oldVideo = await prisma.videos.findUnique({ where: { id: video_id }, select: { src: true } });
+		const oldVideoPath = oldVideo.src;
+		fs.unlink(`upload/${oldVideoPath}`, (err) => {
+			if (err) return res.status(402).json({ msg: `Video not Found` });
+
+			console.log(`video deleted succesfully`);
+		});
+
+		const updatedVideo = await prisma.videos.update({ where: { id: video_id }, data: video });
+		console.log(`Video updated: ${updatedVideo.id}`);
+		return res.status(200).json({ msg: `Video Update Successfully`, data: updatedVideo });
+	} catch (err) {
+		console.error(`Error Occur: ${err}`);
+		return res.status(400).json({ error: `Something went wrong` });
+	}
 });
 
 
@@ -111,14 +152,18 @@ router.put('/edit/:video_id', isLoggedIn, isAdmin, (req, res) => {
 
 router.delete('/delete/:video_id', isLoggedIn, isAdmin, async (req, res) => {
 
-	const videoId = req.params.video_id || null;
+	const videoId = req.params.video_id || 0;
 
 	// * delete video
 	try {
 		const deletedVideo = await prisma.videos.delete({ where: { id: videoId }, select: { src: true } });
 		console.log(deletedVideo);
 		const filePath = deletedVideo.src;
-		fs.unlinkSync(`upload/${filePath}`);
+		fs.unlink(`upload/${filePath}`, (err) => {
+			if (err) return res.status(402).json({ msg: `Video not Found` });
+
+			console.log(`video deleted succesfully`);
+		});
 		return res.status(200).json({ msg: `Video deleted Successfully` });
 	} catch (err) {
 		console.error(`Error Occur: ${err}`);
@@ -126,5 +171,8 @@ router.delete('/delete/:video_id', isLoggedIn, isAdmin, async (req, res) => {
 	}
 });
 
+/**
+ * @desc Serve Video
+ */
 
 module.exports = router;

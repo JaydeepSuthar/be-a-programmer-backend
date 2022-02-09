@@ -19,6 +19,7 @@ app.use(cors({
 
 // * STATIC FILES
 app.use('/static', express.static('public'));
+app.use('/video', express.static('upload'));
 
 // * ROUTES MIDDLEWARES
 app.use('/api/user', require('./routes/user'));

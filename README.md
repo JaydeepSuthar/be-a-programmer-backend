@@ -14,10 +14,10 @@
 
 2. Video
 
-- [ ] Get
-- [ ] Add
-- [ ] Update
-- [ ] Delete
+- [x] Get
+- [x] Add
+- [x] Update
+- [x] Delete
 
 3. Course
 
