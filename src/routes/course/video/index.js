@@ -171,8 +171,4 @@ router.delete('/delete/:video_id', isLoggedIn, isAdmin, async (req, res) => {
 	}
 });
 
-/**
- * @desc Serve Video
- */
-
 module.exports = router;

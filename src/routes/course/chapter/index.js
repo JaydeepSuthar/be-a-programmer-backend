@@ -7,12 +7,38 @@ const { isLoggedIn, isAdmin } = require('../../../middlewares/auth');
 const prisma = require('../../../helper/prisma');
 
 /**
+ * @desc Get all Chapters of Particular Course
+ */
+router.get('/:course_id', async (req, res) => {
+
+	const { course_id } = req.params;
+
+	try {
+		const allChapters = await prisma.chapters.findMany({
+			where: {
+				course_detailsId: course_id
+			},
+			include: {
+				videos: true,
+				assignments: true
+			}
+		});
+		// console.table(allChapters);
+		return res.status(200).json({ msg: `Chapters found`, data: allChapters });
+	} catch (err) {
+		console.log(err.message);
+		return res.status(409).json({ error: `Something went wrong` });
+	}
+});
+
+
+/**
  * @desc Get Single Chapter
  */
 
 router.get('/:chapter_id', async (req, res) => {
 
-	const {chapter_id} = req.params;
+	const { chapter_id } = req.params;
 
 	// * check chapter exists or not
 	const chapterExists = await prisma.chapters.count({ where: { id: chapter_id } });

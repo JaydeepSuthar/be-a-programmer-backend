@@ -10,7 +10,7 @@ const port = process.env.PORT || 8080;
 
 // * MIDDLEWARES
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
 app.use(cors({
 	origin: ['http://localhost:3000'],

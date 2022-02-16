@@ -11,23 +11,15 @@ const prisma = require('../../helper/prisma');
 // * ADMIN ROUTES
 router.get('/all', async (req, res) => {
 
-	// ! return all uses :: this is an admin only route
+	// ! return all user :: this is an admin only route
 	try {
-		const allUsers = await prisma.users.findMany({
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				is_authenticated: true
-			},
-			// orderBy: { id }
-		});
-		res.status(200).json(allUsers);
+		const allUsers = await prisma.users.findMany({});
+		res.status(200).json({ is_success: true, msg: `All Users`, data: allUsers });
 	} catch (err) {
 		res.status(401).json(`Error Occur`);
 	}
 
-})
+});
 
 // * LOGIN ROUTE
 router.post('/login', async (req, res) => {
@@ -64,11 +56,11 @@ router.post('/login', async (req, res) => {
 	const token = generateToken(user.id, "student");
 	const auth = {
 		token
-	}
+	};
 	const loggedInUser = {
 		...user,
 		role: 'student'
-	}
+	};
 	// res.header("authorization", token);
 	res.json({
 		loggedInUser,

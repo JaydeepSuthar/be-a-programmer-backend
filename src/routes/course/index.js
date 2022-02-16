@@ -12,13 +12,13 @@ router.get('/', async (req, res) => {
 	try {
 		const allPublicCourses = await prisma.course_details.findMany({
 			where: { is_active: true },
-			orderBy: [
-				{
-					created_at: 'desc'
+			include: {
+				admin: {
+					select: {
+						name: true
+					}
 				}
-			],
-			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
-			// take: 3,
+			}
 		});
 		res.json(allPublicCourses);
 	} catch (err) {

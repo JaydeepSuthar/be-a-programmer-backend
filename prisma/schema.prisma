@@ -70,12 +70,12 @@ model Blog {
     slug       String   @unique
     body       String
     thumbnail  String
-    tags       String?
+    tags       String[] @db.Array(String)
     is_active  Boolean  @default(true)
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
     admin      Admin?   @relation(fields: [adminId], references: [id])
-    adminId    String? @db.ObjectId
+    adminId    String?  @db.ObjectId
 }
 
 model Cart {
