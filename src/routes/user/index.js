@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 // * VALIDATION
 const { registerUserValidation, loginUserValidation, generateToken } = require('../../helper/validation');
-const { isLoggedIn } = require('../../middlewares/auth');
+const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 
 // * Prisma
 const prisma = require('../../helper/prisma');
@@ -179,5 +179,46 @@ router.delete('/delete/:user_id', async (req, res) => {
 
 	res.end();
 });
+
+
+// * ALL INSTRUCTOR ROUTES HERE
+router.get('/admin/all', isLoggedIn, isAdmin, async (req, res) => {
+	try {
+		const allAdmin = await prisma.admin.findMany({});
+		res.status(200).json({ is_success: true, msg: `All Users`, data: allAdmin });
+	} catch (err) {
+		res.status(401).json(`Error Occur`);
+	}
+});
+
+
+// * DELETE ADMIN USER
+router.delete('/admin/delete/:user_id', async (req, res) => {
+
+	const id = req.params.user_id;
+
+	// Check email and password is valid
+	const user = await prisma.admin.findUnique({
+		where: {
+			id: id
+		}
+	});
+	if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
+
+	try {
+		const deleteUser = await prisma.admin.delete({
+			where: {
+				id: id
+			}
+		});
+		res.json({ msg: `User Succesfully Deleted` });
+	} catch (err) {
+		console.log(err);
+		res.status(400).json(`Error Occur ${err}`);
+	}
+
+	res.end();
+});
+
 
 module.exports = router;

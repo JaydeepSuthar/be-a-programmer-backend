@@ -89,7 +89,7 @@ router.get('/:course_id', async (req, res) => {
 router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
 	const { title, slug, description, thumbnail, price, duration, requirement, is_active, adminId } = req.body;
-
+	// console.log(req.body);
 	// * validate data
 
 	// * check course already exists
@@ -99,12 +99,12 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 		title: title,
 		slug: slug,
 		description: description,
-		thumbnail: thumbnail,
+		thumbnail: thumbnail || '',
 		price: parseFloat(price),
 		duration: duration || "",
 		requirement: requirement || "",
 		is_active: is_active,
-		adminId: adminId,
+		adminId: '620cc340ed391d5f33f13b6d',
 		tags: ['web', 'node', 'js']
 	};
 
@@ -114,7 +114,7 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
 		});
 		console.log(`Course Created\nID: ${{ newCourse }}`);
-		res.json(newCourse);
+		res.json({ is_success: true, msg: `Course Created` });
 	} catch (err) {
 		// res.status(400).json(`Error Occur ${err}`);
 		console.error(`Error Occur ${err}`);
@@ -182,11 +182,17 @@ router.delete('/remove/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 		const deletedCourse = await prisma.course_details.delete({
 			where: { id: course_id },
 		});
-		res.status(200).json(deletedCourse);
+		res.status(200).json({ is_success: true, msg: `${deletedCourse.title} is Deleted Successfylly` });
 	} catch (err) {
-		// res.status(400).json(err);
 		console.log(err);
+		res.status(400).json({ is_success: false, msg: `Something Went Wrong` });
 	}
 });
+
+router.post('/test', (req, res) => {
+	console.log(req.body);
+	console.log(req.file);
+	res.end();
+})
 
 module.exports = router;

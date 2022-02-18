@@ -108,3 +108,5 @@ helper/
 progress.md
 dbschema.json
 upload/
+*.zip
+*7z
