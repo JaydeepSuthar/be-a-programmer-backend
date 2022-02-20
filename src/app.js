@@ -36,7 +36,7 @@ app.get('/api', (req, res) => {
 // *! 404 ERROR PAGE THIS MUST BE A THE END AFTER ALL ROUTES
 app.use('*', (req, res) => {
 	res.status(404).json({
-		"Error": "Page Not Found"
+		error: `Page not found`
 	});
 });
 

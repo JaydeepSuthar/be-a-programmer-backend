@@ -5,6 +5,7 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 
 // * Prisma
 const prisma = require('../../helper/prisma');
+const { createCourseValidation } = require('../../helper/validation');
 
 // * get all public course
 router.get('/', async (req, res) => {
@@ -91,8 +92,9 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 	const { title, slug, description, thumbnail, price, duration, requirement, is_active, adminId } = req.body;
 	// console.log(req.body);
 	// * validate data
-
-	// * check course already exists
+	const { error, value } = createCourseValidation({ title, slug, description, thumbnail, price, duration, requirement, is_active, adminId });
+	console.log(error, value);
+	if (error) return res.status(401).json({ is_success: false, msg: `Error Occurred`, error: error.details[0].message });
 
 	// * saving it in db
 	const courseData = {
@@ -111,13 +113,22 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 	try {
 		const newCourse = await prisma.course_details.create({
 			data: courseData,
-			// select: { id: true, description: true, title: true, thumbnail: true, price: true, tags: true },
+			include: {
+				admin: {
+					select: {
+						name: true
+					}
+				}
+			}
 		});
 		console.log(`Course Created\nID: ${{ newCourse }}`);
-		res.json({ is_success: true, msg: `Course Created` });
+		res.status(200).json({ is_success: true, msg: `New Course Created`, data: newCourse });
 	} catch (err) {
-		// res.status(400).json(`Error Occur ${err}`);
 		console.error(`Error Occur ${err}`);
+		if (err.code === "P2002") {
+			return res.status(400).json({ is_success: false, msg: `Course Already Exists with same title or slug`, error: `Course Already Exists with same title or slug` });
+		}
+		res.status(400).json({ is_success: false, msg: `Error Occurred`, error: err });
 	}
 
 	res.end();
@@ -188,11 +199,5 @@ router.delete('/remove/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 		res.status(400).json({ is_success: false, msg: `Something Went Wrong` });
 	}
 });
-
-router.post('/test', (req, res) => {
-	console.log(req.body);
-	console.log(req.file);
-	res.end();
-})
 
 module.exports = router;

@@ -16,7 +16,7 @@ router.get('/all', async (req, res) => {
 		const allUsers = await prisma.users.findMany({});
 		res.status(200).json({ is_success: true, msg: `All Users`, data: allUsers });
 	} catch (err) {
-		res.status(401).json(`Error Occur`);
+		res.status(401).json({ is_success: false, msg: `Your are not allowed`, error: err });
 	}
 
 });
@@ -43,11 +43,11 @@ router.post('/login', async (req, res) => {
 			password: true
 		}
 	});
-	if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
+	if (!user) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "No Account Found On This Email Please Create Account First" });
 
 	// check password hash is valid
 	const isValidPass = await bcrypt.compare(password, user.password);
-	if (!isValidPass) return res.status(400).json({ "msg": "Email and Password Doesn't match" });
+	if (!isValidPass) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "Email and Password Doesn't match" });
 
 	delete user.password;
 
@@ -62,10 +62,7 @@ router.post('/login', async (req, res) => {
 		role: 'student'
 	};
 	// res.header("authorization", token);
-	res.json({
-		loggedInUser,
-		auth
-	});
+	res.status(200).json({ is_success: true, msg: `Successfully logged in`, data: loggedInUser, auth });
 	// res.end();
 });
 
@@ -84,7 +81,7 @@ router.post('/signup', async (req, res) => {
 			email: email
 		}
 	});
-	if (userExists) return res.status(400).json({ "msg": "Email is already register" });
+	if (userExists) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "Email is already register" });
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -100,13 +97,15 @@ router.post('/signup', async (req, res) => {
 
 	try {
 		const newUser = await prisma.users.create({ data: user, select: { id: true, email: true } });
-		res.json({
-			msg: "User Created",
+		res.status(201).json({
+			is_success: true,
+			msg: "New User Created",
 			"ID": newUser.id,
 			"Email": newUser.email
 		});
 	} catch (err) {
-		res.status(400).json(`Error Occur`);
+		console.log(err.message);
+		res.status(400).json({ is_success: false, msg: `Error Occurred`, error: err });
 	}
 
 	res.end();
@@ -124,7 +123,7 @@ router.patch('/update/:user_id', async (req, res) => {
 			id: id
 		}
 	});
-	if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
+	if (!user) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "No Account Found On This Email Please Create Account First" });
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -143,7 +142,8 @@ router.patch('/update/:user_id', async (req, res) => {
 		});
 		res.json(updatedUser);
 	} catch (err) {
-		res.status(400).json(`Error Occur`);
+		console.log(err.message);
+		res.status(400).json({ is_success: false, msg: `Error Occurred`, error: err });
 		throw err;
 	}
 
@@ -161,7 +161,7 @@ router.delete('/delete/:user_id', async (req, res) => {
 			id: id
 		}
 	});
-	if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
+	if (!user) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "No Account Found On This Email Please Create Account First" });
 
 	try {
 		const deleteUser = await prisma.users.delete({
@@ -203,7 +203,7 @@ router.delete('/admin/delete/:user_id', async (req, res) => {
 			id: id
 		}
 	});
-	if (!user) return res.status(400).json({ "msg": "No Account Found On This Email Please Create Account First" });
+	if (!user) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "No Account Found On This Email Please Create Account First" });
 
 	try {
 		const deleteUser = await prisma.admin.delete({

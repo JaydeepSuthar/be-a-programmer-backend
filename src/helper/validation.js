@@ -26,3 +26,21 @@ module.exports.loginUserValidation = (data) => {
 module.exports.generateToken = (userId, role) => {
 	return jwt.sign({ userId, role }, process.env.TOKEN_SECRET, { expiresIn: `${process.env.TOKEN_EXPIRY_TIME}m` });
 };
+
+module.exports.createCourseValidation = (data) => {
+	const createCourseSchema = Joi.object({
+		title: Joi.string().min(3).max(50).required(),
+		slug: Joi.string().lowercase().min(3).max(24).required(),
+		description: Joi.string().min(5).max(200).required(),
+		thumbnail: Joi.string(),
+		description: Joi.string(),
+		requirement: Joi.string(),
+		duration: Joi.string(),
+		price: Joi.number().required(),
+		is_active: Joi.boolean().required(),
+		adminId: Joi.string().alphanum().required(),
+		tags: Joi.array()
+	});
+
+	return createCourseSchema.validate(data);
+}

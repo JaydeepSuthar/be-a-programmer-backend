@@ -1,5 +1,11 @@
 # be-a-programmer-backend
 
+```
+	Response Format:
+		is_success: true | false,
+		msg: Any Relevent Message
+		data: If Any [it also can be a token]
+```
 
 ## Progress Tracker/Checklist
 
