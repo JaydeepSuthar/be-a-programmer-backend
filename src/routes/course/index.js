@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 
 	try {
 		const allPublicCourses = await prisma.course_details.findMany({
-			where: { is_active: true },
+			// where: { is_active: true },
 			include: {
 				admin: {
 					select: {

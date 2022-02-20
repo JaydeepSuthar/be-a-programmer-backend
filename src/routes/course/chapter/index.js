@@ -19,10 +19,16 @@ router.get('/:course_id', async (req, res) => {
 				course_detailsId: course_id
 			},
 			include: {
-				videos: true,
-				assignments: true
+				_count: {
+					select: {
+						videos: true,
+						assignments: true
+					}
+				}
+
 			}
 		});
+		console.log(JSON.stringify(allChapters, null, 2));
 		// console.table(allChapters);
 		return res.status(200).json({ msg: `Chapters found`, data: allChapters });
 	} catch (err) {
