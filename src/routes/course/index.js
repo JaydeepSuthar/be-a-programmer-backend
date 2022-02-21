@@ -7,6 +7,50 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 const prisma = require('../../helper/prisma');
 const { createCourseValidation } = require('../../helper/validation');
 
+
+router.get('/exams', async (req, res) => {
+	// const { title, form_link, course_id } = req.body;
+	console.log(`i got to run`);
+	try {
+		const allExams = await prisma.exams.findMany({
+			include: {
+				course_details: {
+					select: {
+						title: true,
+					}
+				}
+			}
+		});
+		console.log(allExams);
+		return res.status(200).json({ is_success: true, msg: `Exam Created`, data: allExams });
+	} catch (err) {
+		console.error(err);
+		return res.status(409).json({ is_success: false, msg: `Cannot found exam`, error: err });
+	}
+});
+
+
+router.delete('/exams/delete/:exam_id', async (req, res) => {
+	// const { title, form_link, course_id } = req.body;
+	const exam_id = req.params.exam_id || 0;
+
+	console.log(`i got to run`);
+
+	try {
+		const deletedExam = await prisma.exams.delete({
+			where: {
+				id: exam_id
+			}
+		});
+		console.log(deletedExam);
+		return res.status(200).json({ is_success: true, msg: `Exam deleted`, data: deletedExam });
+	} catch (err) {
+		console.error(err);
+		return res.status(409).json({ is_success: false, msg: `Exam not found`, error: err });
+	}
+});
+
+
 // * get all public course
 router.get('/', async (req, res) => {
 
@@ -198,6 +242,80 @@ router.delete('/remove/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 		console.log(err);
 		res.status(400).json({ is_success: false, msg: `Something Went Wrong` });
 	}
+});
+
+// * get all coupon
+router.get('/coupon', async (req, res) => {
+
+	try {
+		const allCounponCode = await prisma.discount_coupon.findMany();
+		return res.status(200).json({ is_success: true, msg: `Coupon Codes Found`, data: allCounponCode });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ is_success: false, msg: `Coupon not found`, error: err });
+	}
+
+});
+
+// * create coupon
+router.post('/coupon/generate', async (req, res) => {
+
+	const { title, code, discount, valid_till } = req.body;
+	//  coupon_title String @unique
+	// coupon_code  String @unique
+	// discount     Float
+	// valid_till   DateTime
+
+	try {
+		const newCoupon = await prisma.discount_coupon.create({
+			data: {
+				coupon_title: title,
+				coupon_code: code,
+				discount: parseFloat(discount),
+				valid_till
+			}
+		});
+
+		return res.status(200).json({ is_success: true, msg: `New Coupon Generated`, data: newCoupon });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ is_success: false, msg: `Cannot create coupon`, error: err });
+	}
+});
+
+// * exams here
+router.post('/exam/add', async (req, res) => {
+
+	const { title, form_link, courseId, is_active } = req.body;
+
+	console.log(req.body);
+
+	try {
+		const exam = await prisma.exams.create({
+			data: {
+				exam_name: title,
+				google_form_link: form_link,
+				course_detailsId: courseId,
+				is_active: is_active
+			},
+
+			include: {
+				course_details: {
+					select: {
+						title: true,
+					}
+				}
+			}
+		});
+
+		console.log(exam);
+
+		return res.status(200).json({ is_success: true, msg: `Exam Created`, data: exam });
+	} catch (err) {
+		console.error(err);
+		return res.status(409).json({ is_success: false, msg: `Cannot create exam`, error: err });
+	}
+
 });
 
 module.exports = router;

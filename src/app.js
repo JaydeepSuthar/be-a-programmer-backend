@@ -13,7 +13,7 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
 app.use(cors({
-	origin: ['http://localhost:3000'],
+	origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5050', 'http://localhost:3030'],
 	credentials: true
 }));
 
@@ -27,6 +27,8 @@ app.use('/api/blog', require('./routes/blog'));
 app.use('/api/course', require('./routes/course'));
 app.use('/api/video', require('./routes/course/video'));
 app.use('/api/chapter', require('./routes/course/chapter'));
+
+app.use('/api/misc', require('./routes/misc'));
 
 // * ROUTES
 app.get('/api', (req, res) => {

@@ -21,6 +21,19 @@ router.get('/all', async (req, res) => {
 
 });
 
+router.get('/all/count', async (req, res) => {
+
+	// ! return all user :: this is an admin only route
+	try {
+		const totalUserCount = await prisma.users.count({});
+		res.status(200).json({ is_success: true, msg: `Total Users Count`, data: totalUserCount });
+	} catch (err) {
+		res.status(401).json({ is_success: false, msg: `Your are not allowed`, error: err });
+	}
+
+});
+
+
 // * LOGIN ROUTE
 router.post('/login', async (req, res) => {
 
@@ -182,9 +195,40 @@ router.delete('/delete/:user_id', async (req, res) => {
 
 
 // * ALL INSTRUCTOR ROUTES HERE
+router.post('/admin/login', async (req, res) => {
+
+	const { email, password } = req.body;
+
+	try {
+		const loggedInAdminUser = await prisma.admin.findFirst({
+			where: {
+				email: email,
+				AND: {
+					password: password
+				}
+			}
+		});
+
+		const token = generateToken(loggedInAdminUser.id, loggedInAdminUser.role);
+		res.status(200).json({ is_success: true, msg: `logged in success as admin user`, data: { auth_token: token } });
+	} catch (err) {
+		console.error(err);
+		res.status(404).json({ is_success: false, msg: `Invalid Credential`, error: err.message});
+	}
+	res.end();
+});
+
 router.get('/admin/all', isLoggedIn, isAdmin, async (req, res) => {
 	try {
-		const allAdmin = await prisma.admin.findMany({});
+		const allAdmin = await prisma.admin.findMany({
+			where: {
+				role: {
+					not: {
+						equals: 'admin'
+					}
+				}
+			}
+		});
 		res.status(200).json({ is_success: true, msg: `All Users`, data: allAdmin });
 	} catch (err) {
 		res.status(401).json(`Error Occur`);

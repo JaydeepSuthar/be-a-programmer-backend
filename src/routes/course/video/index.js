@@ -36,13 +36,20 @@ const upload = multer({
 /**
  * @desc Get All Videos
  */
-router.get('/', async (req, res) => {
+router.get('/:chapter_id', async (req, res) => {
+
+	const chapter_id = req.params.chapter_id || 0;
+
 	try {
-		const videos = await prisma.videos.findMany({});
+		const videos = await prisma.videos.findMany({
+			where: {
+				chaptersId: chapter_id
+			}
+		});
 		return res.status(200).json({ msg: `Video Found`, data: videos });
 	} catch (err) {
 		console.error(`Error Occur: ${err}`);
-		return res.status(400).json({ error: `Something went wrong` });
+		return res.status(404).json({ is_succes: false, msg: `Videos Not Found`, error: err.message });
 	}
 });
 
@@ -79,8 +86,10 @@ router.get('/:video_id', async (req, res) => {
 router.post('/add', isLoggedIn, isAdmin, upload.single('video'), async (req, res) => {
 
 	const filename = req.file.filename;
+	console.log(filename);
 	const { chapterId, courseId, srno, title, is_visible } = req.body || {};
 
+	console.log(chapterId);
 	if (req.uploadError) return res.status(401).json({ error: `${req.uploadError}` });
 
 	// * Check weather chapter exists and if not create one
@@ -91,16 +100,17 @@ router.post('/add', isLoggedIn, isAdmin, upload.single('video'), async (req, res
 		title: title,
 		src: filename,
 		is_visible: is_visible || true,
-		chaptersId: `61fbd6a30637ca1547b5fdb9`
+		chaptersId: chapterId
 	};
 
 	try {
 		const newVideo = await prisma.videos.create({ data: video });
+		console.log(newVideo);
 		console.log(`New Video Created: ${newVideo.id}`);
-		return res.status(200).json({ msg: `Video Uploaded Successfully`, data: newVideo });
+		return res.status(200).json({ is_succes: true, msg: `Video Uploaded Successfully`, data: newVideo });
 	} catch (err) {
 		console.error(`Error Occur: ${err}`);
-		return res.status(400).json({ error: `Something went wrong` });
+		return res.status(418).json({ is_success: false, msg: `Something went wrong`, error: err });
 	}
 });
 

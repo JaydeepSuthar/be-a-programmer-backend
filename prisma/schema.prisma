@@ -66,8 +66,8 @@ model Auth_token {
 
 model Blog {
     id         String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    title      String   @unique
-    slug       String   @unique
+    title      String?  @unique
+    slug       String?  @unique
     body       String
     thumbnail  String
     tags       String[] @db.Array(String)
@@ -95,9 +95,9 @@ model Chapters {
     assignments Assignments[]
     videos      Videos[]
 
-    created_at       DateTime       @default(now())
-    Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
-    course_detailsId String         @db.ObjectId
+    created_at       DateTime        @default(now())
+    Course_details   Course_details? @relation(fields: [course_detailsId], references: [id])
+    course_detailsId String?         @db.ObjectId
 }
 
 model Course_details {
@@ -122,15 +122,17 @@ model Course_details {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
-    admin      Admin?  @relation(fields: [adminId], references: [id])
+    admin      Admin?   @relation(fields: [adminId], references: [id])
     adminId    String?  @db.ObjectId
 }
 
 model Discount_coupon {
-    id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    coupon_code String   @unique
-    valid_till  DateTime
-    created_at  DateTime @default(now())
+    id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    coupon_title String   @unique
+    coupon_code  String   @unique
+    discount     Float
+    valid_till   String
+    created_at   DateTime @default(now())
 }
 
 model Exam_complete {
@@ -155,15 +157,23 @@ model Exam_questions {
     examsId        String   @db.ObjectId
 }
 
+// ! make it more effecient
 model Exams {
     id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+
+    // REMOVE IT LATER :: START
+    exam_name        String
+    google_form_link String  @unique
+    is_active        Boolean
+    // END
+
 
     exam_questions Exam_questions[]
     exam_complete  Exam_complete[]
 
-    created_at       DateTime       @default(now())
-    course_details   Course_details @relation(fields: [course_detailsId], references: [id])
-    course_detailsId String         @db.ObjectId
+    created_at       DateTime        @default(now())
+    course_details   Course_details? @relation(fields: [course_detailsId], references: [id])
+    course_detailsId String?         @db.ObjectId
 }
 
 model Order_items {

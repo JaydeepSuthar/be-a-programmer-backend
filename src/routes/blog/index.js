@@ -68,10 +68,13 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
 	try {
 		const newBlog = await prisma.blog.create({ data: blog });
-		return res.status(200).json({ is_success: true ,msg: `New Blog Created`, data: newBlog });
+		res.status(200).json({ is_success: true, msg: `New Blog Created`, data: newBlog });
 	} catch (err) {
-		console.log(err.message);
-		return res.status(409).json({ is_success: true, error: `Something went wrong` });
+		console.error(`Error Occur ${err}`);
+		if (err.code === "P2002") {
+			return res.status(409).json({ is_success: false, msg: `Blog Already Exists with same title or slug`, error: `Course Already Exists with same title or slug` });
+		}
+		res.status(400).json({ is_success: false, msg: `Error Occurred`, error: err });
 	}
 });
 
@@ -97,10 +100,13 @@ router.put('/edit/:blog_id', isLoggedIn, isAdmin, async (req, res) => {
 
 	try {
 		const updatedBlog = await prisma.blog.update({ data: blog, where: { id: blog_id } });
-		return res.status(200).json({ msg: `blog updated`, data: updatedBlog });
+		res.status(200).json({ is_success: true, msg: `Blog Updated`, data: updatedBlog });
 	} catch (err) {
-		console.log(err.message);
-		return res.status(409).json({ error: `Something went wrong` });
+		console.error(`Error Occur ${err}`);
+		if (err.code === "P2002") {
+			return res.status(409).json({ is_success: false, msg: `Blog Already Exists with same title or slug`, error: `Course Already Exists with same title or slug` });
+		}
+		res.status(400).json({ is_success: false, msg: `Error Occurred`, error: err });
 	}
 
 });

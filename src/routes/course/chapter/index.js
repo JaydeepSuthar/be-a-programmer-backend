@@ -30,10 +30,10 @@ router.get('/:course_id', async (req, res) => {
 		});
 		console.log(JSON.stringify(allChapters, null, 2));
 		// console.table(allChapters);
-		return res.status(200).json({ msg: `Chapters found`, data: allChapters });
+		return res.status(200).json({ is_success: true, msg: `Chapters found`, data: allChapters });
 	} catch (err) {
 		console.log(err.message);
-		return res.status(409).json({ error: `Something went wrong` });
+		return res.status(404).json({ is_success: false, msg: `Chapters not found`, error: err.message });
 	}
 });
 
@@ -41,7 +41,7 @@ router.get('/:course_id', async (req, res) => {
 /**
  * @desc Get Single Chapter
  */
-
+// ? i don't think this is neccessary now
 router.get('/:chapter_id', async (req, res) => {
 
 	const { chapter_id } = req.params;
@@ -65,28 +65,39 @@ router.get('/:chapter_id', async (req, res) => {
 
 router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
-	const { srno, chapter_name, is_visible, course_id } = req.body || '';
+	const { srno, name, is_visible, course_id } = req.body || '';
 
 	// * check course exists or not
 	const courseExists = await prisma.course_details.count({ where: { id: course_id } });
 	if (!courseExists) return res.status(409).json({ error: `Course Doesn't Exists` });
 
 	// * check chapter with same name exists in course
-	const chapterWithNameExists = await prisma.chapters.count({ where: { AND: { chapter_name: { contains: chapter_name }, course_detailsId: course_id } } });
-	if (chapterWithNameExists) return res.status(409).json({ error: `Chapter with Same Name Exists` });
+	// const chapterWithNameExists = await prisma.chapters.count({ where: { AND: { chapter_name: { contains: chapter_name }, course_detailsId: course_id } } });
+	// if (chapterWithNameExists) return res.status(409).json({ error: `Chapter with Same Name Exists` });
 
 	// * add chapter
 	const chapter = {
 		srno: parseInt(srno),
-		chapter_name: chapter_name,
+		chapter_name: name,
 		is_visible: is_visible,
 		course_detailsId: course_id
 	};
 
 	try {
-		const newChapter = await prisma.chapters.create({ data: chapter });
+		const newChapter = await prisma.chapters.create({
+			data: chapter,
+			include: {
+				_count: {
+					select: {
+						videos: true,
+						assignments: true
+					}
+				}
+			}
+		});
 		return res.status(200).json({ msg: `new chapter created`, data: newChapter });
 	} catch (err) {
+		console.error(err.message);
 		return res.status(409).json({ error: err.message });
 	}
 });
@@ -135,5 +146,12 @@ router.delete('/delete/:chapter_id', isLoggedIn, isAdmin, async (req, res) => {
 		return res.status(409).json({ msg: `Error Occur`, error: err.message });
 	}
 });
+
+// ! all assignment routes go here
+// router.post('/assignment/add', async (req, res) => {
+
+// 	const {} = req.body;
+
+// })
 
 module.exports = router;
