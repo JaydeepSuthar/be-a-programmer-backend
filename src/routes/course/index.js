@@ -7,6 +7,41 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 const prisma = require('../../helper/prisma');
 const { createCourseValidation } = require('../../helper/validation');
 
+// * get all coupon
+router.get('/coupon', async (req, res) => {
+
+	try {
+		const allCounponCode = await prisma.discount_coupon.findMany({});
+		return res.status(200).json({ is_success: true, msg: `Coupon Codes Found`, data: allCounponCode });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ is_success: false, msg: `Coupon not found`, error: err });
+	}
+
+});
+
+// * create coupon
+router.post('/coupon/generate', async (req, res) => {
+
+	const { title, code, discount, valid_till } = req.body;
+
+	try {
+		const newCoupon = await prisma.discount_coupon.create({
+			data: {
+				coupon_title: title,
+				coupon_code: code,
+				discount: parseFloat(discount),
+				valid_till
+			}
+		});
+
+		return res.status(200).json({ is_success: true, msg: `New Coupon Generated`, data: newCoupon });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ is_success: false, msg: `Cannot create coupon`, error: err });
+	}
+});
+
 
 router.get('/exams', async (req, res) => {
 	// const { title, form_link, course_id } = req.body;
@@ -241,45 +276,6 @@ router.delete('/remove/:course_id', isLoggedIn, isAdmin, async (req, res) => {
 	} catch (err) {
 		console.log(err);
 		res.status(400).json({ is_success: false, msg: `Something Went Wrong` });
-	}
-});
-
-// * get all coupon
-router.get('/coupon', async (req, res) => {
-
-	try {
-		const allCounponCode = await prisma.discount_coupon.findMany();
-		return res.status(200).json({ is_success: true, msg: `Coupon Codes Found`, data: allCounponCode });
-	} catch (err) {
-		console.error(err);
-		return res.status(400).json({ is_success: false, msg: `Coupon not found`, error: err });
-	}
-
-});
-
-// * create coupon
-router.post('/coupon/generate', async (req, res) => {
-
-	const { title, code, discount, valid_till } = req.body;
-	//  coupon_title String @unique
-	// coupon_code  String @unique
-	// discount     Float
-	// valid_till   DateTime
-
-	try {
-		const newCoupon = await prisma.discount_coupon.create({
-			data: {
-				coupon_title: title,
-				coupon_code: code,
-				discount: parseFloat(discount),
-				valid_till
-			}
-		});
-
-		return res.status(200).json({ is_success: true, msg: `New Coupon Generated`, data: newCoupon });
-	} catch (err) {
-		console.error(err);
-		return res.status(400).json({ is_success: false, msg: `Cannot create coupon`, error: err });
 	}
 });
 

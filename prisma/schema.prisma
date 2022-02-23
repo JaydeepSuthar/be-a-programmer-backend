@@ -8,9 +8,10 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-enum admin_role {
+enum role {
     admin
     instructor
+    student
 }
 
 enum transactions_status {
@@ -26,11 +27,11 @@ enum users_qualification {
 }
 
 model Admin {
-    id       String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
     name     String
     email    String
     password String
-    role     admin_role @default(instructor)
+    role     role   @default(instructor)
 
     posts   Blog[]
     courses Course_details[]
@@ -229,7 +230,7 @@ model Users {
     is_authenticated Boolean             @default(false)
     qualification    users_qualification
     address          String?
-    // role
+    role             role                @default(student)
 
     assignment_complete Assigment_complete[]
     auth_token          Auth_token[]
