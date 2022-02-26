@@ -3,6 +3,8 @@ require('dotenv').config({ path: __dirname + `/../.env` });
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 // * INIT
 const app = express();
@@ -14,7 +16,20 @@ app.use(express.json());
 app.use(logger('dev'));
 app.use(cors({
 	origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5050', 'http://localhost:3030'],
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 	credentials: true
+}));
+
+// * SESSION & COOKIE SETUP
+app.use(cookieParser());
+app.use(session({
+	key: 'token',
+	secret: process.env.TOKEN_SECRET,
+	resave: false,
+	saveUninitialized: false,
+	cookie: {
+		maxAge: (60 * 60 * 1000)
+	}
 }));
 
 // * STATIC FILES
