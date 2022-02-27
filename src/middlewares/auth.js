@@ -23,17 +23,44 @@ module.exports.isLoggedIn = (req, res, next) => {
 
 module.exports.isAdmin = (req, res, next) => {
 
-	if (process.env.NODE_ENV != 'development') {
-		const authHeader = req.headers['authorization'];
-		const token = authHeader && authHeader.split(' ')[1];
+	if (process.env.NODE_ENV !== 'development') {
+		// const authHeader = req.headers['authorization'];
+		// const token = authHeader && authHeader.split(' ')[1];
 
-		if (!token) return res.status(401).json({ "msg": "Access Denied" });
+		// if (!token) return res.status(401).json({ "msg": "Access Denied" });
 
-		const decodedValue = jwt.decode(token, process.env.TOKEN_SECRET);
-		const role = decodedValue.role;
+		// const decodedValue = jwt.decode(token, process.env.TOKEN_SECRET);
+		// const role = decodedValue.role;
 
-		if (role != 0) return res.status(401).json({ "msg": "Admin Only Routes" });
+		// if (role != 0) return res.status(401).json({ "msg": "Admin Only Routes" });
+
+		console.log(req.session.user);
+
+		if (req.session.user && req.session.user.role === 'admin') {
+			return next();
+		} else if (req.session.user && req.session.user.role === 'instructor') {
+			return res.status(401).json({ is_success: false, "msg": "Instructors are not allowed" });
+		}
+		return res.status(401).json({ is_success: false, "msg": "Admin Only Routes" });
+
 	}
 
 	next();
+};
+
+module.exports.verifyAdmin = (req, res, next) => {
+
+	if (process.env.NODE_ENV !== 'development') {
+		console.log(req.session.user);
+
+		if (req.session.user && req.session.user.role === 'admin') {
+			return next();
+		} else if (req.session.user && req.session.user.role === 'instructor') {
+			return res.status(401).json({ is_success: false, "msg": "Instructors are not allowed" });
+		}
+		return res.status(401).json({ is_success: false, "msg": "Admin Only Routes" });
+	}
+
+	next();
+
 };

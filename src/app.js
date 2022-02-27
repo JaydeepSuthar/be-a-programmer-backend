@@ -28,7 +28,9 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
-		maxAge: (60 * 60 * 1000)
+		maxAge: (60 * 60 * 1000),
+		httpOnly: true,
+		sameSite: true
 	}
 }));
 
@@ -38,6 +40,7 @@ app.use('/video', express.static('upload'));
 
 // * ROUTES MIDDLEWARES
 app.use('/api/user', require('./routes/user'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/blog', require('./routes/blog'));
 app.use('/api/course', require('./routes/course'));
 app.use('/api/video', require('./routes/course/video'));
