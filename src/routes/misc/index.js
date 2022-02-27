@@ -46,4 +46,53 @@ router.get('/stats', async (req, res) => {
 });
 
 
+/**
+ * @desc Get All Assignment
+ */
+router.get('/assignment/:chapter_id', async (req, res) => {
+	const { chapter_id } = req.params;
+
+	try {
+		const allAssignments = await prisma.assignments.findMany({
+			where: {
+				chaptersId: chapter_id
+			},
+		});
+		console.log(JSON.stringify(allAssignments, null, 2));
+		return res.status(200).json({ is_success: true, msg: `Assignement found`, data: allAssignments });
+	} catch (err) {
+		console.error(err.message);
+		return res.status(404).json({ is_success: false, msg: `Assignement not found`, error: err.message });
+	}
+
+});
+
+
+/**
+ * @desc Create Assingment
+ */
+router.post('/assignment/add', async (req, res) => {
+	const { src, chapterId, is_active } = req.body || null;
+
+	console.log(req.body);
+
+	try {
+		const assignment = await prisma.assignments.create({
+			data: {
+				src: src,
+				chaptersId: chapterId,
+				is_visible: is_active
+			}
+		});
+
+		console.log(assignment);
+
+		return res.status(200).json({ is_success: true, msg: `Assignment Created`, data: assignment });
+	} catch (err) {
+		console.error(err);
+		return res.status(409).json({ is_success: false, msg: `Cannot create assignment`, error: err });
+	}
+
+});
+
 module.exports = router;

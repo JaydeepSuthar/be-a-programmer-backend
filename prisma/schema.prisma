@@ -80,7 +80,7 @@ model Assignments {
     src                 String
     is_visible          Boolean              @default(true)
     created_at          DateTime             @default(now())
-    Chapters            Chapters             @relation(fields: [chaptersId], references: [id])
+    Chapters            Chapters?             @relation(fields: [chaptersId], references: [id])
     assignemnt_complete Assigment_complete[]
 }
 
