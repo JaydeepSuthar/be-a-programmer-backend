@@ -95,4 +95,25 @@ router.post('/assignment/add', async (req, res) => {
 
 });
 
+
+/**
+ * @desc Delete Assingment
+ */
+router.delete('/assignment/delete/:assignment_id', async (req, res) => {
+
+	console.log(req.params.assignment_id);
+
+	try {
+		const assignment = await prisma.assignments.delete({ where: { id: req.params.assignment_id } });
+
+		console.log(assignment);
+
+		return res.status(200).json({ is_success: true, msg: `Assignment Deleted`, data: assignment });
+	} catch (err) {
+		console.error(err);
+		return res.status(409).json({ is_success: false, msg: `Cannot create assignment`, error: err });
+	}
+
+});
+
 module.exports = router;

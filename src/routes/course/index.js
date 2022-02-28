@@ -185,7 +185,7 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 		duration: duration || "",
 		requirement: requirement || "",
 		is_active: is_active,
-		adminId: '620cc340ed391d5f33f13b6d',
+		adminId: adminId,
 		tags: ['web', 'node', 'js']
 	};
 

@@ -7,17 +7,21 @@ const { generateToken } = require('../../helper/validation');
 // * Prisma
 const prisma = require('../../helper/prisma');
 
-// * ADMIN ROUTES
-router.get('/all', async (req, res) => {
-
-	// ! return all user :: this is an admin only route
+router.get('/all', isLoggedIn, isAdmin, async (req, res) => {
 	try {
-		const allUsers = await prisma.users.findMany({});
-		res.status(200).json({ is_success: true, msg: `All Users`, data: allUsers });
+		const allAdmin = await prisma.admin.findMany({
+			where: {
+				role: {
+					not: {
+						equals: 'admin'
+					}
+				}
+			}
+		});
+		res.status(200).json({ is_success: true, msg: `All Users`, data: allAdmin });
 	} catch (err) {
-		res.status(401).json({ is_success: false, msg: `Your are not allowed`, error: err });
+		res.status(401).json(`Error Occur`);
 	}
-
 });
 
 

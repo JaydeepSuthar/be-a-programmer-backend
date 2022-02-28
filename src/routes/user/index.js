@@ -8,6 +8,20 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 // * Prisma
 const prisma = require('../../helper/prisma');
 
+// * ADMIN ROUTES
+router.get('/all', async (req, res) => {
+
+	// ! return all user :: this is an admin only route
+	try {
+		const allUsers = await prisma.users.findMany({});
+		res.status(200).json({ is_success: true, msg: `All Users`, data: allUsers });
+	} catch (err) {
+		res.status(401).json({ is_success: false, msg: `Your are not allowed`, error: err });
+	}
+
+});
+
+
 router.get('/all/count', async (req, res) => {
 
 	// ! return all user :: this is an admin only route
@@ -203,23 +217,6 @@ router.post('/admin/login', async (req, res) => {
 		res.status(404).json({ is_success: false, msg: `Invalid Credential`, error: err.message});
 	}
 	res.end();
-});
-
-router.get('/admin/all', isLoggedIn, isAdmin, async (req, res) => {
-	try {
-		const allAdmin = await prisma.admin.findMany({
-			where: {
-				role: {
-					not: {
-						equals: 'admin'
-					}
-				}
-			}
-		});
-		res.status(200).json({ is_success: true, msg: `All Users`, data: allAdmin });
-	} catch (err) {
-		res.status(401).json(`Error Occur`);
-	}
 });
 
 

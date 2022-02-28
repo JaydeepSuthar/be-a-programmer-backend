@@ -49,7 +49,8 @@ router.get('/:blog_id', async (req, res) => {
  */
 router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 
-	const { title, slug, body, thumbnail, tags, is_active, author_id } = req.body;
+	const { title, slug, body, thumbnail, tags, is_active, adminId } = req.body;
+
 
 	// * check weather blog with same slug exists
 	const slugExists = await prisma.blog.count({ where: { slug: { contains: slug } } });
@@ -63,11 +64,13 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 		thumbnail: `test.png`,
 		tags,
 		is_active: is_active || true,
-		adminId: '620cc340ed391d5f33f13b6d'
+		adminId
 	};
+	console.log(blog);
 
 	try {
 		const newBlog = await prisma.blog.create({ data: blog });
+		console.log(newBlog);
 		res.status(200).json({ is_success: true, msg: `New Blog Created`, data: newBlog });
 	} catch (err) {
 		console.error(`Error Occur ${err}`);
