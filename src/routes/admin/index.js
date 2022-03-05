@@ -1,11 +1,11 @@
-const router = require('express').Router();
+const router = require('express').Router()
 
 // * VALIDATION
-const { isLoggedIn, isAdmin, verifyAdmin } = require('../../middlewares/auth');
-const { generateToken } = require('../../helper/validation');
+const { isLoggedIn, isAdmin, verifyAdmin } = require('../../middlewares/auth')
+const { generateToken } = require('../../helper/validation')
 
 // * Prisma
-const prisma = require('../../helper/prisma');
+const prisma = require('../../helper/prisma')
 
 router.get('/all', isLoggedIn, isAdmin, async (req, res) => {
 	try {
@@ -17,12 +17,12 @@ router.get('/all', isLoggedIn, isAdmin, async (req, res) => {
 					}
 				}
 			}
-		});
-		res.status(200).json({ is_success: true, msg: `All Users`, data: allAdmin });
+		})
+		res.status(200).json({ is_success: true, msg: `All Users`, data: allAdmin })
 	} catch (err) {
-		res.status(401).json(`Error Occur`);
+		res.status(401).json(`Error Occur`)
 	}
-});
+})
 
 
 /**
@@ -30,9 +30,9 @@ router.get('/all', isLoggedIn, isAdmin, async (req, res) => {
  */
 router.post('/login', async (req, res) => {
 
-	const { email, password } = req.body || undefined;
+	const { email, password } = req.body || undefined
 
-	console.log(email, password);
+	console.log(email, password)
 
 	try {
 
@@ -41,33 +41,33 @@ router.post('/login', async (req, res) => {
 				email: email
 			},
 			rejectOnNotFound: true
-		});
+		})
 
-		if (!(loggedInUser.password === password)) throw Error(`Password Doesn't Match`);
+		if (!(loggedInUser.password === password)) throw Error(`Password Doesn't Match`)
 
 		// console.log(`LOGGED IN USER ${JSON.stringify(loggedInUser)}`);
 
 		if (loggedInUser) {
-			delete loggedInUser.password;
-			req.session.user = loggedInUser;
+			delete loggedInUser.password
+			req.session.user = loggedInUser
 
-			const token = generateToken(loggedInUser.id, loggedInUser.role);
+			const token = generateToken(loggedInUser.id, loggedInUser.role)
 
-			return res.status(200).json({ is_success: true, msg: 'Admin Logged In Success', data: loggedInUser, token: token });
+			return res.status(200).json({ is_success: true, msg: 'Admin Logged In Success', data: loggedInUser, token: token })
 		}
 
 	} catch (err) {
-		console.error(err);
-		return res.status(409).json({ is_success: true, msg: 'Invalid Credentials', error: err });
+		console.error(err)
+		return res.status(409).json({ is_success: true, msg: 'Invalid Credentials', error: err })
 	}
-});
+})
 
 
 /**
  * @desc
  */
 router.post('/add', async (req, res) => {
-	const { name, email, password, role } = req.body || null;
+	const { name, email, password, role } = req.body || null
 
 	try {
 		const newAdminUser = await prisma.admin.create({
@@ -77,25 +77,25 @@ router.post('/add', async (req, res) => {
 				password: password,
 				role: role
 			}
-		});
+		})
 
-		return res.status(200).json({ is_success: true, msg: `New ${newAdminUser.role.toUpperCase()} user created`, data: newAdminUser });
+		return res.status(200).json({ is_success: true, msg: `New ${newAdminUser.role.toUpperCase()} user created`, data: newAdminUser })
 	} catch (err) {
-		console.error(err);
-		return res.status(400).json({ is_success: false, msg: 'Error in creating user', error: err });
+		console.error(err)
+		return res.status(400).json({ is_success: false, msg: 'Error in creating user', error: err })
 	}
 })
 
 router.get('/secret', verifyAdmin, (req, res) => {
-	return res.status(200).json({ is_success: true, msg: 'Admin Secret' });
-});
+	return res.status(200).json({ is_success: true, msg: 'Admin Secret' })
+})
 router.get('/', (req, res) => {
-	return res.status(200).json({ is_success: true, msg: 'Admin routes' });
-});
-
-router.delete('/logout', isAdmin, (req, res) => {
-	req.session.destroy();
-	res.status(200).json({ is_success: true, msg: `You are succesfully logged out` });
+	return res.status(200).json({ is_success: true, msg: 'Admin routes' })
 })
 
-module.exports = router;
+router.delete('/logout', (req, res) => {
+	req.session.destroy()
+	res.status(200).json({ is_success: true, msg: `You are succesfully logged out` })
+})
+
+module.exports = router
