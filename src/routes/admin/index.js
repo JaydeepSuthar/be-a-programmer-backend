@@ -67,15 +67,14 @@ router.post('/login', async (req, res) => {
  * @desc
  */
 router.post('/add', async (req, res) => {
-	const { name, email, password, role } = req.body || null
+	const { name, email, password } = req.body || null
 
 	try {
 		const newAdminUser = await prisma.admin.create({
 			data: {
 				name: name,
 				email: email,
-				password: password,
-				role: role
+				password: password
 			}
 		})
 
