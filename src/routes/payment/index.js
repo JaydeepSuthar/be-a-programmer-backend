@@ -7,17 +7,10 @@ const { isLoggedIn, isAdmin } = require("../../middlewares/auth");
 const prisma = require("../../helper/prisma");
 
 // * Razorpay
-// const { generateOrder } = require('../../helper/payment');
+const { generateOrder } = require('../../helper/payment');
 
-const Razorpay = require('razorpay');
-const { nanoid } = require('nanoid');
-
-
-const razorpay = new Razorpay({
-	key_id: process.env.RAZORPAY_KEY_ID,
-	key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
+// * Mail
+const { sendMail } = require('../../helper/auth_mail');
 
 /**
  * @desc Payment Route
@@ -34,22 +27,19 @@ router.post('/create', async (req, res) => {
 	// console.log(course.price);
 
 	const coursePrice = course.price;
-	// const order = await generateOrder(coursePrice);
-	const order = await razorpay.orders.create({
-		amount: coursePrice * 100,
-		receipt: `Receipt: ${nanoid()}`,
-		payment_capture: 1
-	});
+	const order = await generateOrder(coursePrice);
 
 	console.log(order);
 
-	const orderData = {
-		id: order.id,
-		amount: order.amount,
-		receipt: order.receipt,
-	};
+	return res.status(200).json({ is_success: true, msg: `Order Generated`, data: order });
+});
 
-	return res.status(200).json({ is_success: true, msg: `Order Generated`, data: orderData });
+/**
+ * @desc Auth Mail
+ */
+router.get('/mail', async (req, res) => {
+	const response = await sendMail();
+	return res.status(200).json({ is_success: true, msg: response });
 });
 
 module.exports = router;

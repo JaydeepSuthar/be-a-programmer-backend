@@ -23,6 +23,7 @@
 	"homepage": "https://github.com/JaydeepSuthar/be-a-programmer-backend#readme",
 	"dependencies": {
 		"@prisma/client": "3.7.0",
+		"@sendgrid/mail": "7.6.2",
 		"bcrypt": "5.0.1",
 		"cookie-parser": "1.4.6",
 		"cors": "2.8.5",
