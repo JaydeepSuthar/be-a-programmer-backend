@@ -1,3 +1,4 @@
 {
 	// "typescript.disableAutomaticTypeAcquisition": true,
+	"javascript.format.semicolons": "insert",
 }
