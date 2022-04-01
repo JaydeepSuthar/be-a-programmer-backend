@@ -8,6 +8,10 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 // * Prisma
 const prisma = require('../../helper/prisma');
 
+// * SendGrid
+const { sendMail } = require("../../helper/mail");
+
+
 // * ADMIN ROUTES
 router.get('/all', async (req, res) => {
 
@@ -83,7 +87,7 @@ router.post('/login', async (req, res) => {
 // * SIGNUP ROUTE / ADD USER
 router.post('/signup', async (req, res) => {
 
-	const { name, email, contact, password } = req.body;
+	const { name, email, contact, password, qual } = req.body;
 
 	// * check data is valid
 	const { error, value } = registerUserValidation({ name, email, contact, password });
@@ -105,18 +109,21 @@ router.post('/signup', async (req, res) => {
 		email: email,
 		contact: contact,
 		password: hashedPassword,
-		qualification: 'higher_secondary'
+		qualification: `higher_secondary`
 	};
 
 
 	try {
-		const newUser = await prisma.users.create({ data: user, select: { id: true, email: true } });
+		const newUser = await prisma.users.create({ data: user });
+		await sendMail(newUser.email, newUser.name);
+
 		res.status(201).json({
 			is_success: true,
 			msg: "New User Created",
-			"ID": newUser.id,
-			"Email": newUser.email
+			data: newUser
 		});
+
+
 	} catch (err) {
 		console.log(err.message);
 		res.status(400).json({ is_success: false, msg: `Error Occurred`, error: err });
@@ -214,7 +221,7 @@ router.post('/admin/login', async (req, res) => {
 		res.status(200).json({ is_success: true, msg: `logged in success as admin user`, data: { auth_token: token } });
 	} catch (err) {
 		console.error(err);
-		res.status(404).json({ is_success: false, msg: `Invalid Credential`, error: err.message});
+		res.status(404).json({ is_success: false, msg: `Invalid Credential`, error: err.message });
 	}
 	res.end();
 });

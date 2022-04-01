@@ -7,38 +7,40 @@ const { isLoggedIn, isAdmin } = require("../../middlewares/auth");
 const prisma = require("../../helper/prisma");
 
 // * Razorpay
-const { generateOrder } = require('../../helper/payment');
+const { generateOrders } = require('../../helper/payment');
 
-// * Mail
-const { sendMail } = require('../../helper/auth_mail');
+// * SendGrid
+const { sendMail } = require("../../helper/mail");
 
 /**
- * @desc Payment Route
+ * @desc Create Payment
  */
-// TODO: add payment route
+
 router.post('/create', async (req, res) => {
-	// console.log(req.body);
+	const course_id = req.body.course_id;
 
 	const course = await prisma.course_details.findUnique({
 		where: {
-			id: req.body.course_id
+			id: course_id
 		}
 	});
-	// console.log(course.price);
-
 	const coursePrice = course.price;
-	const order = await generateOrder(coursePrice);
 
-	console.log(order);
-
-	return res.status(200).json({ is_success: true, msg: `Order Generated`, data: order });
+	try {
+		const orderData = await generateOrders(coursePrice);
+		return res.status(200).json({ is_success: true, msg: `Order Generated`, data: orderData });
+	} catch (err) {
+		return res.status(200).json({ is_success: true, msg: `Error While Generating Order` + err });
+	}
 });
 
 /**
- * @desc Auth Mail
+ * @desc Send Welcome Mail
  */
 router.get('/mail', async (req, res) => {
+
 	const response = await sendMail();
+
 	return res.status(200).json({ is_success: true, msg: response });
 });
 
