@@ -26,7 +26,7 @@ module.exports.sendMail = async (userEmailAddress, username) => {
 	try {
 		await mail.send(msg);
 	} catch (err) {
-		return `Error Occur ` + err;
+		console.log(`Error Occur ` + err);
 	}
-	return `Mail is Sent Succesfully`;
+	console.log(`Mail is Sent Succesfully`);
 };

@@ -39,6 +39,8 @@ app.use('/static', express.static('public'));
 app.use('/video', express.static('upload'));
 
 // * ROUTES MIDDLEWARES
+// app.use('/api/watch', require('./routes/watch')) // ? this where video get served
+
 app.use('/api/user', require('./routes/user'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/blog', require('./routes/blog'));

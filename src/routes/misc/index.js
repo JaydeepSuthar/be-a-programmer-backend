@@ -7,6 +7,35 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 const prisma = require('../../helper/prisma');
 
 /**
+ * @desc Load All Courses with It's Children
+ */
+// router.get('/courses/all', (req, res) => {
+// 	try {
+// 		const allPublicCourses = await prisma.course_details.findMany({
+// 			where: { is_active: true },
+// 			include: {
+// 				admin: {
+// 					select: {
+// 						name: true
+// 					}
+// 				},
+// 				chapters: {
+// 					select: {
+// 						chapter_name:
+// 					}
+// 				}
+// 			}
+// 		});
+// 		res.json(allPublicCourses);
+// 	} catch (err) {
+// 		res.status(400).json(`Error Occur in ${err}`);
+// 	}
+// 	res.end();
+
+// })
+
+
+/**
  * @desc Get Stats
  */
 router.get('/stats', async (req, res) => {
