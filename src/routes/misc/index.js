@@ -35,6 +35,32 @@ const prisma = require('../../helper/prisma');
 // })
 
 
+// * check coupon is valid or not
+router.post('/coupon/check', async (req, res) => {
+	const coupon = req.body.coupon;
+
+	console.log(req.body);
+
+	res.end();
+	// try {
+	// 	const getCoupon = await prisma.discount_coupon.findUnique({
+	// 		where: {
+	// 			coupon_code: coupon
+	// 		}
+	// 	});
+
+	// 	if (!getCoupon) {
+	// 		return res.status(400).json({ is_success: false, msg: `Coupon is Not Valid` });
+	// 	}
+
+	// 	return res.status(200).json({ is_success: true, msg: `Coupon is Valid`, data: getCoupon.discount });
+	// } catch (err) {
+	// 	console.log(err)
+	// 	return res.status(400).json({ is_success: false, msg: `Something Went Wrong` });
+	// }
+});
+
+
 /**
  * @desc Get Stats
  */

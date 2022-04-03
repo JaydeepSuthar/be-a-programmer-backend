@@ -61,26 +61,36 @@ router.post('/login', async (req, res) => {
 			password: true
 		}
 	});
-	if (!user) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "No Account Found On This Email Please Create Account First" });
+	if (!user) return res.status(400).json({ is_success: false, msg: `No Account Found On This Email Please Create Account First` });
 
 	// check password hash is valid
 	const isValidPass = await bcrypt.compare(password, user.password);
-	if (!isValidPass) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "Email and Password Doesn't match" });
+	if (!isValidPass) return res.status(400).json({ is_success: false, msg: `"Email and Password Doesn't match"` });
 
 	delete user.password;
 
+	if (user) {
+		req.session.user = user;
+
+		const token = generateToken(user.id, "student");
+
+		return res.status(200).json({ is_success: true, msg: 'Logged In Success', data: { ...user, role: "student" }, token: token });
+	}
+
+
 	// const token = jwt.sign
 	// ! solve the role error
-	const token = generateToken(user.id, "student");
-	const auth = {
-		token
-	};
-	const loggedInUser = {
-		...user,
-		role: 'student'
-	};
+	// ** this is old way
+	// const token = generateToken(user.id, "student");
+	// const auth = {
+	// 	token
+	// };
+	// const loggedInUser = {
+	// 	...user,
+	// 	role: 'student'
+	// };
 	// res.header("authorization", token);
-	res.status(200).json({ is_success: true, msg: `Successfully logged in`, data: loggedInUser, auth });
+	// res.status(200).json({ is_success: true, msg: `Successfully logged in`, data: loggedInUser, auth });
 	// res.end();
 });
 

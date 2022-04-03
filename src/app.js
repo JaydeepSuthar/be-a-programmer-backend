@@ -48,6 +48,7 @@ app.use('/api/course', require('./routes/course'));
 app.use('/api/video', require('./routes/course/video'));
 app.use('/api/chapter', require('./routes/course/chapter'));
 app.use('/api/payment', require('./routes/payment'));
+app.use('/api/cart', require('./routes/cart'));
 
 app.use('/api/misc', require('./routes/misc'));
 
