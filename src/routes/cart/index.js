@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 // * VALIDATION
-const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
+const { isLoggedIn, isAdmin, verifyUserLogin } = require('../../middlewares/auth');
 
 // * Prisma
 const prisma = require('../../helper/prisma');

@@ -10,6 +10,31 @@ const prisma = require('../../helper/prisma');
  * @desc Get All Blog
  */
 router.get('/', async (req, res) => {
+
+	if (req.session.user && req.session.user.role === 'instructor') {
+		let instructor_id = req.session.user.id;
+
+		try {
+			const allBlogs = await prisma.blog.findMany({
+				where: {
+					adminId: instructor_id
+				},
+				include: {
+					admin: {
+						select: {
+							name: true
+						}
+					}
+				}
+			});
+			return res.status(200).json({ msg: `All Blogs`, data: allBlogs });
+		} catch (err) {
+			console.log(err.message);
+			return res.status(409).json({ error: `Something went wrong` });
+		}
+
+	}
+
 	try {
 		const allBlogs = await prisma.blog.findMany({
 			include: {

@@ -37,7 +37,7 @@ router.post('/coupon/check', async (req, res) => {
 
 		return res.status(200).json({ is_success: true, msg: `Coupon is Valid`, data: getCoupon.discount });
 	} catch (err) {
-		console.log(err)
+		console.log(err);
 		return res.status(400).json({ is_success: false, msg: `Something Went Wrong` });
 	}
 });
@@ -112,9 +112,41 @@ router.delete('/exams/delete/:exam_id', async (req, res) => {
 // * get all public course
 router.get('/', async (req, res) => {
 
+	if (req.session.user && req.session.user.role === 'instructor') {
+		let instructor_id = req.session.user.id;
+
+		try {
+			const allPublicCourses = await prisma.course_details.findMany({
+				where: {
+					AND: [
+						{
+							is_active: true
+						},
+						{
+							adminId: instructor_id
+						}
+					]
+				},
+				include: {
+					admin: {
+						select: {
+							name: true
+						}
+					}
+				}
+			});
+			return res.status(200).json(allPublicCourses);
+		} catch (err) {
+			return res.status(418).json(`Error Occur in ${err}`);
+		}
+
+	}
+
 	try {
 		const allPublicCourses = await prisma.course_details.findMany({
-			where: { is_active: true },
+			where: {
+				is_active: true
+			},
 			include: {
 				admin: {
 					select: {
@@ -123,9 +155,10 @@ router.get('/', async (req, res) => {
 				}
 			}
 		});
-		res.json(allPublicCourses);
+		res.status(200).json(allPublicCourses);
 	} catch (err) {
-		res.status(400).json(`Error Occur in ${err}`);
+		console.log(err)
+		res.status(404).json(`Error Occur in ${err}`);
 	}
 	res.end();
 });

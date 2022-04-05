@@ -64,3 +64,17 @@ module.exports.verifyAdmin = (req, res, next) => {
 	next();
 
 };
+
+module.exports.verifyUserLogin = (req, res, next) => {
+
+	if (process.env.NODE_ENV !== 'development') {
+		console.log(req.session.user);
+
+		if (!req.session.user) {
+			return res.status(200).json({ is_success: false, msg: `Please Logged Logged In` });
+		}
+	}
+
+	next();
+
+};
