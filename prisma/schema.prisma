@@ -51,7 +51,7 @@ model Users {
   address          String?
   role             role                @default(student)
 
-//   learning            Learning?            @relation(fields: [learningId], references: [id])
+  //   learning            Learning?            @relation(fields: [learningId], references: [id])
   assignment_complete Assigment_complete[]
   auth_token          Auth_token[]
   cart                Cart[]
@@ -64,7 +64,7 @@ model Users {
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
   Transactions Transactions[]
-//   learningId   String         @db.ObjectId
+  //   learningId   String         @db.ObjectId
 }
 
 model Assigment_complete {
@@ -140,7 +140,7 @@ model Course_details {
   is_active   Boolean  @default(false)
   tags        String[] @db.Array(String)
 
-//   learning    Learning?     @relation(fields: [learningId], references: [id])
+  //   learning    Learning?     @relation(fields: [learningId], references: [id])
   cart        Cart[]
   chapters    Chapters[]
   exams       Exams[]
@@ -153,7 +153,7 @@ model Course_details {
   updated_at DateTime @updatedAt
   admin      Admin?   @relation(fields: [adminId], references: [id])
   adminId    String?  @db.ObjectId
-//   learningId String?  @db.ObjectId
+  //   learningId String?  @db.ObjectId
 }
 
 model Discount_coupon {
@@ -280,7 +280,7 @@ model Whistlist {
 }
 
 model Learning {
-  id             String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  course_id      String
-  user_id        String
+  id        String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  course_id String
+  user_id   String
 }

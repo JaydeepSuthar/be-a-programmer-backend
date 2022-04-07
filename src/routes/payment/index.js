@@ -77,14 +77,7 @@ router.post('/success', async (req, res) => {
 	const allItemsInCart = await prisma.cart.findMany({
 		where: {
 			usersId: req.session.user.id
-		},
-		// include: {
-		// 	Course_details: {
-		// 		select: {
-		// 			id: true
-		// 		}
-		// 	}
-		// }
+		}
 	});
 
 	let purchasedCourses = [];

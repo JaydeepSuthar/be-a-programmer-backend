@@ -60,6 +60,25 @@ router.post('/add', async (req, res) => {
 			}
 		});
 
+		const myLearning = await prisma.learning.findFirst({
+			where: {
+				AND: [
+					{
+						user_id: req.session.user.id
+					},
+					{
+						course_id: course_id
+					}
+				]
+			}
+		});
+
+		console.log(myLearning);
+
+		if (myLearning) {
+			return res.status(200).json({ is_success: false, msg: `You have already purchased this course` });
+		}
+
 		if (oldCartItem) {
 			return res.status(200).json({ is_success: false, msg: `Item is already in cart` });
 		}

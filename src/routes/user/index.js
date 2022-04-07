@@ -265,5 +265,4 @@ router.delete('/admin/delete/:user_id', async (req, res) => {
 	res.end();
 });
 
-
 module.exports = router;

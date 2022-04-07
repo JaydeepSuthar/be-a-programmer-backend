@@ -171,4 +171,43 @@ router.delete('/assignment/delete/:assignment_id', async (req, res) => {
 
 });
 
+
+/**
+ * @desc Get My Learning
+ */
+router.get('/learning', async (req, res) => {
+	if (!req.session.user) {
+		return res.status(200).json({ is_success: false, msg: `Please Logged In First` });
+	}
+
+	const myLearning = await prisma.learning.findMany({
+		where: {
+			user_id: req.session.user.id
+		}
+	})
+
+	console.log(myLearning)
+
+	if (!myLearning) {
+		return res.status(404).json({ is_success: false, msg: `You not enrolled in any courses` });
+	} else {
+		let coursesIds = myLearning.map(item => item.course_id);
+		const courses = await prisma.course_details.findMany({
+			where: {
+				id: { in: coursesIds }
+			},
+			select: {
+				id: true,
+				title: true,
+				thumbnail: true
+			}
+		});
+
+		console.log(courses)
+
+		return res.status(200).json({ is_success: true, msg: `All Courses you are enrolled in`, data: courses });
+	}
+
+});
+
 module.exports = router;
