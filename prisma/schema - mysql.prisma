@@ -1,11 +1,10 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["mongoDb"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("MYSQL_DATABASE_URL")
 }
 
 enum role {
@@ -16,7 +15,7 @@ enum role {
 
 enum transactions_status {
   in_process
-  captured
+  success
   failed
 }
 
@@ -27,7 +26,7 @@ enum users_qualification {
 }
 
 model Admin {
-  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id       Int    @id @default(autoincrement())
   name     String
   email    String @unique
   password String
@@ -41,7 +40,7 @@ model Admin {
 }
 
 model Users {
-  id               String              @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id               Int                 @id @default(autoincrement())
   name             String
   email            String              @unique
   contact          String
@@ -51,7 +50,6 @@ model Users {
   address          String?
   role             role                @default(student)
 
-  //   learning            Learning?            @relation(fields: [learningId], references: [id])
   assignment_complete Assigment_complete[]
   auth_token          Auth_token[]
   cart                Cart[]
@@ -64,36 +62,33 @@ model Users {
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
   Transactions Transactions[]
-  //   learningId   String         @db.ObjectId
 }
 
 model Assigment_complete {
-  id            String       @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  usersId       String?      @db.ObjectId
-  Users         Users?       @relation(fields: [usersId], references: [id])
-  assignmentsId String?      @db.ObjectId
-  Assignments   Assignments? @relation(fields: [assignmentsId], references: [id])
+  id     Int     @id @default(autoincrement())
+  userId Int?
+  users  Users[]
 }
 
 model Assignments {
-  id                  String               @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id                  Int                  @id @default(autoincrement())
   chaptersId          String               @db.ObjectId
   src                 String
   is_visible          Boolean              @default(true)
   created_at          DateTime             @default(now())
-  Chapters            Chapters?            @relation(fields: [chaptersId], references: [id], onDelete: Cascade)
+  Chapters            Chapters?            @relation(fields: [chaptersId], references: [id])
   assignemnt_complete Assigment_complete[]
 }
 
 model Auth_token {
-  id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id      Int    @id @default(autoincrement())
   token   String
   Users   Users  @relation(fields: [usersId], references: [id])
   usersId String @db.ObjectId
 }
 
 model Blog {
-  id         String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id         Int      @id @default(autoincrement())
   title      String?  @unique
   slug       String?  @unique
   body       String
@@ -107,7 +102,7 @@ model Blog {
 }
 
 model Cart {
-  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id               Int            @id @default(autoincrement())
   Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
   course_detailsId String         @db.ObjectId
   Users            Users          @relation(fields: [usersId], references: [id])
@@ -115,7 +110,7 @@ model Cart {
 }
 
 model Chapters {
-  id           String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id           Int     @id @default(autoincrement())
   srno         Int
   chapter_name String
   is_visible   Boolean @default(true)
@@ -124,12 +119,12 @@ model Chapters {
   videos      Videos[]
 
   created_at       DateTime        @default(now())
-  Course_details   Course_details? @relation(fields: [course_detailsId], references: [id], onDelete: Cascade)
+  Course_details   Course_details? @relation(fields: [course_detailsId], references: [id])
   course_detailsId String?         @db.ObjectId
 }
 
 model Course_details {
-  id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id          Int      @id @default(autoincrement())
   title       String   @unique
   slug        String   @unique
   description String
@@ -140,7 +135,6 @@ model Course_details {
   is_active   Boolean  @default(false)
   tags        String[] @db.Array(String)
 
-  //   learning    Learning?     @relation(fields: [learningId], references: [id])
   cart        Cart[]
   chapters    Chapters[]
   exams       Exams[]
@@ -153,11 +147,10 @@ model Course_details {
   updated_at DateTime @updatedAt
   admin      Admin?   @relation(fields: [adminId], references: [id])
   adminId    String?  @db.ObjectId
-  //   learningId String?  @db.ObjectId
 }
 
 model Discount_coupon {
-  id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id           Int      @id @default(autoincrement())
   coupon_title String   @unique
   coupon_code  String   @unique
   discount     Float
@@ -166,7 +159,7 @@ model Discount_coupon {
 }
 
 model Exam_complete {
-  id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id           Int      @id @default(autoincrement())
   total_marks  Int
   completed_on DateTime @default(now())
   exams        Exams    @relation(fields: [examsId], references: [id])
@@ -176,7 +169,7 @@ model Exam_complete {
 }
 
 model Exam_questions {
-  id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id Int @id @default(autoincrement())
 
   option_a       String   @unique
   option_b       String   @unique
@@ -189,7 +182,7 @@ model Exam_questions {
 
 // ! make it more effecient
 model Exams {
-  id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id Int @id @default(autoincrement())
 
   // REMOVE IT LATER :: START
   exam_name        String
@@ -202,20 +195,20 @@ model Exams {
   exam_complete  Exam_complete[]
 
   created_at       DateTime        @default(now())
-  course_details   Course_details? @relation(fields: [course_detailsId], references: [id], onDelete: Cascade)
-  course_detailsId String?         @unique @db.ObjectId
+  course_details   Course_details? @relation(fields: [course_detailsId], references: [id])
+  course_detailsId String?         @db.ObjectId
 }
 
 model Order_items {
-  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id               Int            @id @default(autoincrement())
   Course_details   Course_details @relation(fields: [course_detailsId], references: [id])
   course_detailsId String         @db.ObjectId
-  //   Transactions     Transactions   @relation(fields: [transactionsId], references: [id])
-  //   transactionsId   String         @db.ObjectId
+  Transactions     Transactions   @relation(fields: [transactionsId], references: [id])
+  transactionsId   String         @db.ObjectId
 }
 
 model Questions {
-  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id               Int            @id @default(autoincrement())
   question         String
   reply            String
   created_at       DateTime       @default(now())
@@ -226,7 +219,7 @@ model Questions {
 }
 
 model Reviews {
-  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id               Int            @id @default(autoincrement())
   review           String
   is_approved      Boolean
   created_at       DateTime       @default(now())
@@ -237,20 +230,21 @@ model Reviews {
 }
 
 model Transactions {
-  id                  String              @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id                  Int                 @id @default(autoincrement())
   order_no            String              @unique
-  //   razorpay_order_id   String
+  razorpay_order_id   String
   razorpay_payment_id String
+  razorpay_signature  String
   status              transactions_status @default(in_process)
   purchase_date       DateTime            @default(now())
 
-  users   Users  @relation(fields: [usersId], references: [id])
-  //   order_items Order_items[]
-  usersId String @db.ObjectId
+  users       Users         @relation(fields: [usersId], references: [id])
+  order_items Order_items[]
+  usersId     String        @db.ObjectId
 }
 
 model Video_watched {
-  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id       Int    @id @default(autoincrement())
   Users    Users  @relation(fields: [usersId], references: [id])
   usersId  String @db.ObjectId
   Videos   Videos @relation(fields: [videosId], references: [id])
@@ -258,7 +252,7 @@ model Video_watched {
 }
 
 model Videos {
-  id         String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id         Int     @id @default(autoincrement())
   srno       Int
   title      String
   src        String
@@ -267,27 +261,14 @@ model Videos {
   video_watched Video_watched[]
 
   created_at DateTime  @default(now())
-  Chapters   Chapters? @relation(fields: [chaptersId], references: [id], onDelete: Cascade)
+  Chapters   Chapters? @relation(fields: [chaptersId], references: [id])
   chaptersId String?   @db.ObjectId
 }
 
 model Whistlist {
-  id               String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id               Int             @id @default(autoincrement())
   Course_details   Course_details? @relation(fields: [course_detailsId], references: [id])
   course_detailsId String?         @db.ObjectId
   Users            Users?          @relation(fields: [usersId], references: [id])
   usersId          String?         @db.ObjectId
-}
-
-model Learning {
-  id        String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  course_id String
-  user_id   String
-}
-
-model UserComplains {
-  id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  name    String
-  mail    String
-  message String
 }

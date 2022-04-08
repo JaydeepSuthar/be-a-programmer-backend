@@ -143,32 +143,38 @@ router.post('/signup', async (req, res) => {
 });
 
 // * EDIT USER
-router.patch('/update/:user_id', async (req, res) => {
+router.patch('/update', async (req, res) => {
 
-	const id = req.params.user_id;
-	const { name, contact, password } = req.body;
+	if (!req.session.user) {
+		return res.status(200).json({ is_success: false, msg: `Please Logged In First` });
+	}
+
+	// const id = req.params.user_id;
+	const { name, contact, qualification, email, address  } = req.body;
 
 	// Check email and password is valid
 	const user = await prisma.users.findUnique({
 		where: {
-			id: id
+			id: req.session.user.id
 		}
 	});
 	if (!user) return res.status(400).json({ is_success: false, msg: `Error Occurred`, error: "No Account Found On This Email Please Create Account First" });
 
-	const hashedPassword = await bcrypt.hash(password, 10);
+	// const hashedPassword = await bcrypt.hash(password, 10);
 
 	// * saving it in db
 	const userData = {
 		name: name,
 		contact: contact,
-		password: hashedPassword,
-		qualification: 'higher_secondary'
+		// password: hashedPassword,
+		qualification: qualification,
+		email: email,
+		address: address
 	};
 
 	try {
 		const updatedUser = await prisma.users.update({
-			where: { id: id },
+			where: { id: req.session.user.id },
 			data: userData
 		});
 		res.json(updatedUser);

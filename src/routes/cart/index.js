@@ -23,8 +23,10 @@ router.get('/', async (req, res) => {
 			include: {
 				Course_details: {
 					select: {
+						id: true,
 						title: true,
-						price: true
+						price: true,
+						thumbnail: true
 					}
 				}
 			}
@@ -98,6 +100,39 @@ router.post('/add', async (req, res) => {
 	} catch (err) {
 		console.log(err);
 		return res.status(400).json({ is_success: false, msg: err });
+	}
+});
+
+/**
+ * @desc Delete item in cart
+ */
+router.post("/delete", async (req, res) => {
+	const cartItemId = req.body.id;
+	console.log(req.body);
+	// res.end();
+
+	if (!req.session.user) {
+		return res.status(200).json({ is_success: false, msg: `Logged In to Add to Cart` });
+	}
+
+
+	try {
+		await prisma.cart.deleteMany({
+			where: {
+				AND: [
+					{
+						usersId: req.session.user.id
+					},
+					{
+						course_detailsId: cartItemId
+					}
+				]
+			}
+		});
+		return res.status(200).json({ msg: "Successfully Removed item from cart" });
+	} catch (err) {
+		console.log(err);
+		return res.status(400).json({ msg: "Error While removing item from cart" + err });
 	}
 });
 
