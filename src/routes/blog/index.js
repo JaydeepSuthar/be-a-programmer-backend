@@ -86,7 +86,7 @@ router.post('/add', isLoggedIn, isAdmin, async (req, res) => {
 		title,
 		slug,
 		body,
-		thumbnail: `test.png`,
+		thumbnail: thumbnail,
 		tags,
 		is_active: is_active || true,
 		adminId

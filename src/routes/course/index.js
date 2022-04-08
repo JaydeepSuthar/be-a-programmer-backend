@@ -118,14 +118,7 @@ router.get('/', async (req, res) => {
 		try {
 			const allPublicCourses = await prisma.course_details.findMany({
 				where: {
-					AND: [
-						{
-							is_active: true
-						},
-						{
-							adminId: instructor_id
-						}
-					]
+					adminId: instructor_id
 				},
 				include: {
 					admin: {
@@ -155,9 +148,10 @@ router.get('/', async (req, res) => {
 				}
 			}
 		});
+
 		res.status(200).json(allPublicCourses);
 	} catch (err) {
-		console.log(err)
+		console.log(err);
 		res.status(404).json(`Error Occur in ${err}`);
 	}
 	res.end();

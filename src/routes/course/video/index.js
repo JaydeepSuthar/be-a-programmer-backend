@@ -45,7 +45,7 @@ router.get("/all/:course_id", async (req, res) => {
 				course_detailsId: course_id,
 			},
 			include: {
-				videos: true,
+				videos: true
 			},
 		});
 

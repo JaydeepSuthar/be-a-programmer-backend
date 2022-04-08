@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(logger('dev'));
 app.use(cors({
 	origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5050', 'http://localhost:3030', 'https://beap-frontend.herokuapp.com'],
-	methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+	methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 	credentials: true
 }));
 
