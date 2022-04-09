@@ -33,6 +33,10 @@ router.post('/coupon/check', async (req, res) => {
 
 		if (!getCoupon) {
 			return res.status(400).json({ is_success: false, msg: `Coupon is Not Valid` });
+		} else {
+			if (!(getCoupon.valid_till > Date.now())) {
+				return res.status(400).json({ is_success: false, msg: `Coupon is Expired` });
+			}
 		}
 
 		return res.status(200).json({ is_success: true, msg: `Coupon is Valid`, data: getCoupon.discount });

@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
+  url      = "mongodb+srv://admin:admin@mvp.9vto4.mongodb.net/beap_mvp?retryWrites=true&w=majority"
 }
 
 enum role {
