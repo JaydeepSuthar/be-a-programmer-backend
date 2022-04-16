@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // * VALIDATION
 const { registerUserValidation, loginUserValidation, generateToken } = require('../../helper/validation');
@@ -9,7 +10,7 @@ const { isLoggedIn, isAdmin } = require('../../middlewares/auth');
 const prisma = require('../../helper/prisma');
 
 // * SendGrid
-const { sendMail } = require("../../helper/mail");
+const { sendMail, sendResetPasswordLink } = require("../../helper/mail");
 
 
 // * ADMIN ROUTES
@@ -142,6 +143,45 @@ router.post('/signup', async (req, res) => {
 	res.end();
 });
 
+// * FORGOT PASSWORD ROUTE
+router.post('/forgot', async (req, res) => {
+
+	const email = req.body.email;
+
+	if (prisma.users.count({ where: { email: email } })) return res.status(404).json({ is_success: false, msg: `No Account On this Email Fuond` });
+
+	const token = jwt.sign({ email }, process.env.TOKEN_SECRET, { expiresIn: '5m' });
+	console.log(token);
+	await sendResetPasswordLink(token, email);
+	return res.status(200).json({ is_success: true, msg: `Reset Link is Send to Your Email` });
+});
+
+router.post('/reset', async (req, res) => {
+	const { token, password } = req.body;
+
+	if (!jwt.verify(token, process.env.TOKEN_SECRET)) return res.status(404).json({ is_success: false, msg: `Invalid Reset Token` });
+
+	const decodedToken = jwt.decode(token);
+	const email = decodedToken.email;
+	const hashedPassword = await bcrypt.hash(password, 10);
+
+	try {
+		const updateUserPassword = await prisma.users.update({
+			where: {
+				email: email
+			},
+			data: {
+				password: hashedPassword
+			}
+		});
+
+		console.log(updateUserPassword);
+		res.status(200).json({ is_success: true, msg: `Password Resetted Successfully` });
+	} catch (err) {
+		res.status(400).json({ is_success: false, msg: `Error Occur`, err: err });
+	}
+});
+
 // * EDIT USER
 router.patch('/update', async (req, res) => {
 
@@ -150,7 +190,7 @@ router.patch('/update', async (req, res) => {
 	}
 
 	// const id = req.params.user_id;
-	const { name, contact, qualification, email, address  } = req.body;
+	const { name, contact, qualification, email, address } = req.body;
 
 	// Check email and password is valid
 	const user = await prisma.users.findUnique({

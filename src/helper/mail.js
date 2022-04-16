@@ -30,3 +30,28 @@ module.exports.sendMail = async (userEmailAddress, username) => {
 	}
 	console.log(`Mail is Sent Succesfully`);
 };
+
+module.exports.sendResetPasswordLink = async (token, email) => {
+	const msg = {
+		to: `${email}`,
+		from: {
+			name: `Be A Programmer`,
+			email: `sutharjaydeep20@gmail.com`
+		},
+		subject: `Reset Password`,
+		html: `
+			<h1>Reset Password</h1>
+			<br>
+			<p>reset link will expire in 5 minutes</p>
+			<a href="http://localhost:3000/reset/${token}">Reset Password</a>
+		`
+	};
+
+
+	try {
+		await mail.send(msg);
+		console.log(`mail is sent`)
+	} catch (err) {
+		console.log(`Cannot send Mail :: ` + err);
+	}
+};
