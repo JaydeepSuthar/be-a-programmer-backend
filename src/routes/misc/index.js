@@ -78,16 +78,30 @@ router.get('/stats', async (req, res) => {
 			// 		}
 			// 	}
 			// });
-			const totalCourseCount = await prisma.course_details.count({
+			const totalCourse = await prisma.course_details.findMany({
 				where: {
 					adminId: req.session.user.id
 				}
 			});
+			const allCoursesIds = totalCourse.map(item => item.id);
+			const myCourseLearning = await prisma.learning.findMany({
+				where: {
+					course_id: {
+						in: allCoursesIds
+					}
+				}
+			});
+			// myCourseLearning.map(item => console.table(item));
+			// const totalCourseCount = await prisma.course_details.count({
+			// 	where: {
+			// 		adminId: req.session.user.id
+			// 	}
+			// });
 			// const totalBlogCount = await prisma.blog.count({});
 
 			const allStats = {
-				users: 0,
-				courses: totalCourseCount,
+				users: myCourseLearning.length,
+				courses: allCoursesIds.length,
 				blogs: 0,
 				instructors: 0
 			};
